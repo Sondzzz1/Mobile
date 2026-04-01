@@ -18,6 +18,7 @@ class DatCocDao(private val db: SQLiteDatabase) {
             put("tien_dat_coc", datCoc.tienDatCoc)
             put("gia_phong", datCoc.giaPhong)
             put("ngay_du_kien_vao", datCoc.ngayDuKienVao)
+            put("trang_thai", datCoc.trangThai)
             put("ghi_chu", datCoc.ghiChu)
             put("ngay_tao", datCoc.ngayTao)
         }

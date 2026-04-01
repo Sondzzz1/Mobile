@@ -168,25 +168,24 @@ class CreateContractFragment : Fragment() {
                     }
                 }
 
-                // Tạo hoặc tìm khách thuê (ưu tiên CMND)
+                // Tạo hoặc tìm khách thuê
                 var maKhach = -1L
                 
-                // Tìm theo CMND trước (chính xác nhất)
+                // Tìm theo SĐT trước
                 if (sdt.isNotEmpty()) {
-                    val khachTheoCmnd = dbManager.khachThueDao.layTatCa()
-                        .find { it.soCmnd.isNotEmpty() && it.soCmnd == sdt }
-                    
-                    if (khachTheoCmnd != null) {
-                        maKhach = khachTheoCmnd.maKhach
+                    val khachTheoSdt = dbManager.khachThueDao.timKiem(sdt)
+                    if (khachTheoSdt.isNotEmpty()) {
+                        maKhach = khachTheoSdt[0].maKhach
                     }
                 }
                 
-                // Nếu không tìm thấy theo CMND, tìm theo SĐT
+                // Nếu không tìm thấy, tạo mới
                 if (maKhach == -1L) {
-                    val ds = dbManager.khachThueDao.timKiem(sdt)
-                    maKhach = if (ds.isNotEmpty()) ds[0].maKhach
-                    else dbManager.khachThueDao.them(
-                        com.example.btl_mobile_son.data.model.KhachThue(hoTen = hoTen, soDienThoai = sdt)
+                    maKhach = dbManager.khachThueDao.them(
+                        com.example.btl_mobile_son.data.model.KhachThue(
+                            hoTen = hoTen, 
+                            soDienThoai = sdt
+                        )
                     )
                 }
 
@@ -203,6 +202,24 @@ class CreateContractFragment : Fragment() {
                 
                 if (maHopDongEdit > 0) {
                     dbManager.hopDongDao.capNhat(hopDong)
+                    
+                    // Cập nhật người đại diện trong HopDongThanhVien nếu thay đổi
+                    val hopDongCu = dbManager.hopDongDao.layTheoMa(maHopDongEdit)
+                    if (hopDongCu != null && hopDongCu.maKhach != maKhach) {
+                        // Tìm thành viên đại diện cũ và cập nhật
+                        val thanhVienCu = dbManager.hopDongThanhVienDao.layTheoHopDong(maHopDongEdit)
+                            .find { it.vaiTro == "dai_dien" }
+                        
+                        if (thanhVienCu != null) {
+                            // Cập nhật thành viên đại diện mới
+                            dbManager.hopDongThanhVienDao.capNhat(
+                                thanhVienCu.copy(
+                                    maKhach = maKhach,
+                                    ghiChu = "Người đại diện hợp đồng (đã cập nhật)"
+                                )
+                            )
+                        }
+                    }
                     
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, "✓ Đã cập nhật hợp đồng", Toast.LENGTH_SHORT).show()

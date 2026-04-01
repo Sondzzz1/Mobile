@@ -8,7 +8,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "quan_ly_nha_tro.db"
-        private const val DATABASE_VERSION = 6
+        private const val DATABASE_VERSION = 7  // Tăng version để trigger onUpgrade
 
         // Tên bảng
         const val TABLE_NHA_TRO = "nha_tro"
@@ -98,6 +98,22 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             )
         """)
 
+        // Bảng Hợp đồng thành viên (hỗ trợ nhiều người ở ghép)
+        db.execSQL("""
+            CREATE TABLE $TABLE_HOP_DONG_THANH_VIEN (
+                maThanhVien INTEGER PRIMARY KEY AUTOINCREMENT,
+                maHopDong INTEGER NOT NULL,
+                maKhach INTEGER NOT NULL,
+                vaiTro TEXT DEFAULT 'thanh_vien',
+                ngayVaoO INTEGER DEFAULT 0,
+                ngayRoiDi INTEGER,
+                trangThai TEXT DEFAULT 'dang_o',
+                ghiChu TEXT,
+                FOREIGN KEY (maHopDong) REFERENCES $TABLE_HOP_DONG(ma_hop_dong) ON DELETE CASCADE,
+                FOREIGN KEY (maKhach) REFERENCES $TABLE_KHACH_THUE(ma_khach) ON DELETE CASCADE
+            )
+        """)
+
         // Bảng Dịch vụ
         db.execSQL("""
             CREATE TABLE $TABLE_DICH_VU (
@@ -139,6 +155,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 tien_dat_coc REAL NOT NULL,
                 gia_phong REAL DEFAULT 0,
                 ngay_du_kien_vao INTEGER DEFAULT 0,
+                trang_thai TEXT DEFAULT 'hieu_luc',
                 ghi_chu TEXT,
                 ngay_tao INTEGER DEFAULT 0,
                 FOREIGN KEY (ma_phong) REFERENCES $TABLE_PHONG(ma_phong) ON DELETE CASCADE
