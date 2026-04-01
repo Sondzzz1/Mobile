@@ -81,7 +81,7 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:src="@android:drawable/ic_menu_my_calendar"
-            android:tint="#BDBDBD"
+            app:tint="#BDBDBD"
             android:layout_marginBottom="16dp"/>
 
         <TextView

@@ -22,7 +22,7 @@
                 android:layout_height="24dp"
                 android:layout_centerVertical="true"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
-                android:tint="@color/white"
+                app:tint="@color/white"
                 android:contentDescription="Quay lại" />
 
             <TextView

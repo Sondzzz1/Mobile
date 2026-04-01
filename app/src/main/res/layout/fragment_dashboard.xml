@@ -22,7 +22,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_sort_by_size"
-                android:tint="@color/white"
+                app:tint="@color/white"
                 android:layout_centerVertical="true"
                 android:contentDescription="Menu"/>
             
@@ -30,7 +30,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:src="@android:drawable/ic_menu_info_details"
-                android:tint="@color/white"
+                app:tint="@color/white"
                 android:layout_centerInParent="true"
                 android:contentDescription="Logo"/>
             
@@ -39,7 +39,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_popup_reminder"
-                android:tint="@color/white"
+                app:tint="@color/white"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:contentDescription="Thông báo"/>
@@ -281,7 +281,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:src="@android:drawable/ic_lock_idle_alarm"
-                        android:tint="#E65100"
+                        app:tint="#E65100"
                         android:contentDescription="Nhắc nhở"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -315,7 +315,7 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:src="@android:drawable/ic_dialog_info"
-                        android:tint="@color/colorPrimary"
+                        app:tint="@color/colorPrimary"
                         android:layout_marginEnd="12dp"
                         android:contentDescription="Info"/>
 
@@ -383,7 +383,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@android:drawable/ic_menu_myplaces"
-                                android:tint="@color/white"
+                                app:tint="@color/white"
                                 android:layout_gravity="center"
                                 android:contentDescription="Nhà"/>
                         </androidx.cardview.widget.CardView>
@@ -418,7 +418,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@android:drawable/ic_menu_view"
-                                android:tint="@color/white"
+                                app:tint="@color/white"
                                 android:layout_gravity="center"
                                 android:contentDescription="Phòng"/>
                         </androidx.cardview.widget.CardView>
@@ -453,7 +453,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@android:drawable/ic_menu_preferences"
-                                android:tint="@color/white"
+                                app:tint="@color/white"
                                 android:layout_gravity="center"
                                 android:contentDescription="Dịch vụ"/>
                         </androidx.cardview.widget.CardView>
@@ -488,7 +488,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@android:drawable/ic_menu_agenda"
-                                android:tint="@color/white"
+                                app:tint="@color/white"
                                 android:layout_gravity="center"
                                 android:contentDescription="Hợp đồng"/>
                         </androidx.cardview.widget.CardView>
@@ -531,7 +531,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@android:drawable/ic_menu_compass"
-                                android:tint="@color/white"
+                                app:tint="@color/white"
                                 android:layout_gravity="center"
                                 android:contentDescription="Điện nước"/>
                         </androidx.cardview.widget.CardView>
@@ -566,7 +566,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@android:drawable/ic_menu_recent_history"
-                                android:tint="@color/white"
+                                app:tint="@color/white"
                                 android:layout_gravity="center"
                                 android:contentDescription="Cọc giữ chỗ"/>
                         </androidx.cardview.widget.CardView>
@@ -601,7 +601,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@android:drawable/ic_menu_my_calendar"
-                                android:tint="@color/white"
+                                app:tint="@color/white"
                                 android:layout_gravity="center"
                                 android:contentDescription="Khách thuê"/>
                         </androidx.cardview.widget.CardView>
@@ -636,7 +636,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@android:drawable/ic_menu_report_image"
-                                android:tint="@color/white"
+                                app:tint="@color/white"
                                 android:layout_gravity="center"
                                 android:contentDescription="Hóa đơn"/>
                         </androidx.cardview.widget.CardView>
@@ -679,7 +679,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@android:drawable/ic_input_add"
-                                android:tint="@color/white"
+                                app:tint="@color/white"
                                 android:layout_gravity="center"
                                 android:contentDescription="Thu"/>
                         </androidx.cardview.widget.CardView>
@@ -714,7 +714,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@android:drawable/ic_delete"
-                                android:tint="@color/white"
+                                app:tint="@color/white"
                                 android:layout_gravity="center"
                                 android:contentDescription="Chi"/>
                         </androidx.cardview.widget.CardView>
@@ -749,7 +749,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@android:drawable/ic_menu_save"
-                                android:tint="@color/white"
+                                app:tint="@color/white"
                                 android:layout_gravity="center"
                                 android:contentDescription="Cọc khách"/>
                         </androidx.cardview.widget.CardView>
@@ -784,7 +784,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:src="@android:drawable/ic_menu_sort_alphabetically"
-                                android:tint="@color/white"
+                                app:tint="@color/white"
                                 android:layout_gravity="center"
                                 android:contentDescription="Thống kê"/>
                         </androidx.cardview.widget.CardView>
