@@ -36,12 +36,23 @@ class HoaDonAdapter(
         holder.tvAmount.text = "${String.format("%,.0f", hd.tongTien)} đ"
         holder.tvRoomCost.text = "${String.format("%,.0f", hd.tienPhong)} đ"
         holder.tvServiceCost.text = "${String.format("%,.0f", hd.tongTienDichVu)} đ"
-        if (hd.daThanhToan) {
-            holder.tvStatus.text = "Đã thanh toán"
-            holder.tvStatus.setTextColor(Color.parseColor("#4CAF50"))
-        } else {
-            holder.tvStatus.text = "Chưa thanh toán"
-            holder.tvStatus.setTextColor(Color.parseColor("#F44336"))
+        when (hd.trangThai) {
+            "da_thanh_toan" -> {
+                holder.tvStatus.text = "Đã thanh toán"
+                holder.tvStatus.setTextColor(Color.parseColor("#4CAF50"))
+            }
+            "thanh_toan_mot_phan" -> {
+                holder.tvStatus.text = "Thanh toán một phần"
+                holder.tvStatus.setTextColor(Color.parseColor("#FF9800"))
+            }
+            "qua_han" -> {
+                holder.tvStatus.text = "Quá hạn"
+                holder.tvStatus.setTextColor(Color.parseColor("#F44336"))
+            }
+            else -> {
+                holder.tvStatus.text = "Chưa thanh toán"
+                holder.tvStatus.setTextColor(Color.parseColor("#F44336"))
+            }
         }
         holder.itemView.setOnClickListener { onItemClick(hd) }
         holder.itemView.setOnLongClickListener { onItemLongClick(hd); true }

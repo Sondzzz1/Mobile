@@ -116,7 +116,7 @@ class DashboardFragment : Fragment() {
             val soKhach = dbManager.khachThueDao.layTatCa().size
 
             // Hóa đơn chưa thanh toán
-            val hoaDonChuaTT = dbManager.hoaDonDao.layTatCa().count { !it.daThanhToan }
+            val hoaDonChuaTT = dbManager.hoaDonDao.layTatCa().count { it.trangThai != "da_thanh_toan" }
 
             // Doanh thu tháng này
             val calendar = Calendar.getInstance()

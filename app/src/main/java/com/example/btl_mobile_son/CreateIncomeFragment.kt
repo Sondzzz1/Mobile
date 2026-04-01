@@ -93,8 +93,8 @@ class CreateIncomeFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            val soTien = soTienStr.toDoubleOrNull() ?: 0.0
-            if (!ValidationHelper.isValidAmount(soTien)) {
+            val soTien = soTienStr.toLongOrNull() ?: 0L
+            if (!ValidationHelper.isValidAmount(soTien.toDouble())) {
                 Toast.makeText(context, ValidationHelper.getAmountErrorMessage(), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }

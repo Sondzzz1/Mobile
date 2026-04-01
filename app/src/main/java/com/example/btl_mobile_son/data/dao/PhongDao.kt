@@ -150,12 +150,15 @@ class PhongDao(private val db: SQLiteDatabase) {
     }
 
     private fun cursorToPhong(cursor: Cursor): Phong {
+        // Convert từ REAL (Double) sang Long cho database v6
+        val giaDouble = cursor.getDouble(cursor.getColumnIndexOrThrow("gia_co_ban"))
+        
         return Phong(
             maPhong = cursor.getLong(cursor.getColumnIndexOrThrow("ma_phong")),
             maNha = cursor.getLong(cursor.getColumnIndexOrThrow("ma_nha")),
             tenPhong = cursor.getString(cursor.getColumnIndexOrThrow("ten_phong")),
             dienTichM2 = cursor.getFloat(cursor.getColumnIndexOrThrow("dien_tich_m2")),
-            giaCoBan = cursor.getLong(cursor.getColumnIndexOrThrow("gia_co_ban")),
+            giaCoBan = giaDouble.toLong(), // Convert Double → Long
             trangThai = cursor.getString(cursor.getColumnIndexOrThrow("trang_thai")),
             soNguoiToiDa = cursor.getInt(cursor.getColumnIndexOrThrow("so_nguoi_toi_da")),
             ghiChu = cursor.getString(cursor.getColumnIndexOrThrow("ghi_chu")) ?: ""

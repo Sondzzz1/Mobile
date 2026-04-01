@@ -8,7 +8,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "quan_ly_nha_tro.db"
-        private const val DATABASE_VERSION = 7 // Tăng từ 6 lên 7 (đổi Double → Long, thêm constraints)
+        private const val DATABASE_VERSION = 6 // Giữ nguyên v6
 
         // Tên bảng
         const val TABLE_NHA_TRO = "nha_tro"
@@ -239,9 +239,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         if (oldVersion < 6) {
             upgradeToVersion6(db)
         }
-        if (oldVersion < 7) {
-            upgradeToVersion7(db)
-        }
+        // Không có v7 - giữ nguyên v6
     }
     
     private fun upgradeToVersion4(db: SQLiteDatabase) {

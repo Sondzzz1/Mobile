@@ -136,6 +136,10 @@ class DatCocDao(private val db: SQLiteDatabase) {
     }
 
     private fun cursorToDatCoc(cursor: Cursor): DatCoc {
+        // Convert từ REAL (Double) sang Long cho database v6
+        val tienDatCocDouble = cursor.getDouble(cursor.getColumnIndexOrThrow("tien_dat_coc"))
+        val giaPhongDouble = cursor.getDouble(cursor.getColumnIndexOrThrow("gia_phong"))
+        
         return DatCoc(
             maDatCoc = cursor.getLong(cursor.getColumnIndexOrThrow("ma_dat_coc")),
             maPhong = cursor.getLong(cursor.getColumnIndexOrThrow("ma_phong")),
@@ -143,8 +147,8 @@ class DatCocDao(private val db: SQLiteDatabase) {
             soDienThoai = cursor.getString(cursor.getColumnIndexOrThrow("so_dien_thoai")) ?: "",
             soCmnd = cursor.getString(cursor.getColumnIndexOrThrow("so_cmnd")) ?: "",
             email = cursor.getString(cursor.getColumnIndexOrThrow("email")) ?: "",
-            tienDatCoc = cursor.getLong(cursor.getColumnIndexOrThrow("tien_dat_coc")),
-            giaPhong = cursor.getLong(cursor.getColumnIndexOrThrow("gia_phong")),
+            tienDatCoc = tienDatCocDouble.toLong(), // Convert Double → Long
+            giaPhong = giaPhongDouble.toLong(), // Convert Double → Long
             ngayDuKienVao = cursor.getLong(cursor.getColumnIndexOrThrow("ngay_du_kien_vao")),
             trangThai = cursor.getString(cursor.getColumnIndexOrThrow("trang_thai")) ?: "hieu_luc",
             ghiChu = cursor.getString(cursor.getColumnIndexOrThrow("ghi_chu")) ?: "",

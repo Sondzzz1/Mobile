@@ -36,11 +36,17 @@ class InvoiceListFragment : Fragment() {
         val rvInvoiceList = view.findViewById<RecyclerView>(R.id.rvInvoiceList)
         adapter = HoaDonAdapter(
             onItemClick = { hoaDon ->
+                val statusText = when (hoaDon.trangThai) {
+                    "da_thanh_toan" -> "Đã thanh toán"
+                    "thanh_toan_mot_phan" -> "Thanh toán một phần"
+                    "qua_han" -> "Quá hạn"
+                    else -> "Chưa thanh toán"
+                }
                 AlertDialog.Builder(requireContext())
                     .setTitle("Hóa đơn tháng ${hoaDon.thang}/${hoaDon.nam}")
-                    .setMessage("Tổng tiền: ${String.format("%,.0f", hoaDon.tongTien)} đ\nTrạng thái: ${if (hoaDon.daThanhToan) "Đã thanh toán" else "Chưa thanh toán"}")
-                    .setPositiveButton(if (hoaDon.daThanhToan) "Đóng" else "Đánh dấu đã TT") { _, _ ->
-                        if (!hoaDon.daThanhToan) {
+                    .setMessage("Tổng tiền: ${String.format("%,.0f", hoaDon.tongTien)} đ\nTrạng thái: $statusText")
+                    .setPositiveButton(if (hoaDon.trangThai == "da_thanh_toan") "Đóng" else "Đánh dấu đã TT") { _, _ ->
+                        if (hoaDon.trangThai != "da_thanh_toan") {
                             CoroutineScope(Dispatchers.IO).launch {
                                 // Đánh dấu hóa đơn đã thanh toán
                                 dbManager.hoaDonDao.danhDauDaThanhToan(hoaDon.maHoaDon)

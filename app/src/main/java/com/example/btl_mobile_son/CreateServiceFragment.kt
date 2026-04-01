@@ -95,8 +95,8 @@ class CreateServiceFragment : Fragment() {
                 Toast.makeText(context, "Nhập đơn giá", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            val donGia = donGiaStr.toDoubleOrNull() ?: 0.0
-            if (!ValidationHelper.isValidAmount(donGia)) {
+            val donGia = donGiaStr.toLongOrNull() ?: 0L
+            if (!ValidationHelper.isValidAmount(donGia.toDouble())) {
                 Toast.makeText(context, ValidationHelper.getAmountErrorMessage(), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }

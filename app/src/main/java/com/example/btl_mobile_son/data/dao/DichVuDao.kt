@@ -142,12 +142,15 @@ class DichVuDao(private val db: SQLiteDatabase) {
         val cachTinhIndex = cursor.getColumnIndex("cach_tinh")
         val isActiveIndex = cursor.getColumnIndex("is_active")
         
+        // Convert từ REAL (Double) sang Long cho database v6
+        val donGiaDouble = cursor.getDouble(cursor.getColumnIndexOrThrow("don_gia"))
+        
         return DichVu(
             maDichVu = cursor.getLong(cursor.getColumnIndexOrThrow("ma_dich_vu")),
             maNha = cursor.getLong(cursor.getColumnIndexOrThrow("ma_nha")),
             tenDichVu = cursor.getString(cursor.getColumnIndexOrThrow("ten_dich_vu")),
             donVi = cursor.getString(cursor.getColumnIndexOrThrow("don_vi")) ?: "",
-            donGia = cursor.getLong(cursor.getColumnIndexOrThrow("don_gia")),
+            donGia = donGiaDouble.toLong(), // Convert Double → Long
             cachTinh = if (cachTinhIndex >= 0) cursor.getString(cachTinhIndex) ?: "theo_phong" else "theo_phong",
             loaiDichVu = cursor.getString(cursor.getColumnIndexOrThrow("loai_dich_vu")),
             isActive = if (isActiveIndex >= 0) cursor.getInt(isActiveIndex) == 1 else true

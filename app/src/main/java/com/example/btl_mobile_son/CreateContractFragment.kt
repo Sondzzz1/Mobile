@@ -115,8 +115,8 @@ class CreateContractFragment : Fragment() {
                 Toast.makeText(context, "Nhập giá thuê", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            val giaThue = giaStr.toDoubleOrNull() ?: 0.0
-            if (!ValidationHelper.isValidAmount(giaThue)) {
+            val giaThue = giaStr.toLongOrNull() ?: 0L
+            if (!ValidationHelper.isValidAmount(giaThue.toDouble())) {
                 Toast.makeText(context, ValidationHelper.getAmountErrorMessage(), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -191,7 +191,7 @@ class CreateContractFragment : Fragment() {
                     ngayBatDau = ngayBatDau,
                     ngayKetThuc = ngayKetThuc,
                     giaThueThang = giaThue,
-                    tienDatCoc = datCocStr.toDoubleOrNull() ?: 0.0,
+                    tienDatCoc = datCocStr.toLongOrNull() ?: 0L,
                     trangThai = "dang_thue"
                 )
                 

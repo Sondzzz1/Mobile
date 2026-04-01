@@ -144,14 +144,18 @@ class HopDongDao(private val db: SQLiteDatabase) {
     }
 
     private fun cursorToHopDong(cursor: Cursor): HopDong {
+        // Convert từ REAL (Double) sang Long cho database v6
+        val giaThueDouble = cursor.getDouble(cursor.getColumnIndexOrThrow("gia_thue_thang"))
+        val tienDatCocDouble = cursor.getDouble(cursor.getColumnIndexOrThrow("tien_dat_coc"))
+        
         return HopDong(
             maHopDong = cursor.getLong(cursor.getColumnIndexOrThrow("ma_hop_dong")),
             maPhong = cursor.getLong(cursor.getColumnIndexOrThrow("ma_phong")),
             maKhach = cursor.getLong(cursor.getColumnIndexOrThrow("ma_khach")),
             ngayBatDau = cursor.getLong(cursor.getColumnIndexOrThrow("ngay_bat_dau")),
             ngayKetThuc = cursor.getLong(cursor.getColumnIndexOrThrow("ngay_ket_thuc")),
-            giaThueThang = cursor.getLong(cursor.getColumnIndexOrThrow("gia_thue_thang")),
-            tienDatCoc = cursor.getLong(cursor.getColumnIndexOrThrow("tien_dat_coc")),
+            giaThueThang = giaThueDouble.toLong(), // Convert Double → Long
+            tienDatCoc = tienDatCocDouble.toLong(), // Convert Double → Long
             trangThai = cursor.getString(cursor.getColumnIndexOrThrow("trang_thai"))
         )
     }

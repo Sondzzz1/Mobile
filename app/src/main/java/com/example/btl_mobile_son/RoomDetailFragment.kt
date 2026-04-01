@@ -81,7 +81,11 @@ class RoomDetailFragment : Fragment() {
                 nha = dbManager.nhaTroDao.layTheoMa(p.maNha)
             }
             hopDongHienTai = dbManager.hopDongDao.layHopDongDangThue(maPhong)
-            danhSachKhachThue = dbManager.khachThueDao.layTheoPhong(maPhong)
+            
+            // Lấy danh sách khách thuê đang ở trong phòng từ hợp đồng hiện tại
+            val tvs = hopDongHienTai?.let { dbManager.hopDongThanhVienDao.layNguoiDangOTheoHopDong(it.maHopDong) } ?: emptyList()
+            danhSachKhachThue = tvs.mapNotNull { tv -> dbManager.khachThueDao.layTheoMa(tv.maKhach) }
+            
             lichSuHopDong = dbManager.hopDongDao.layTheoPhong(maPhong)
             withContext(Dispatchers.Main) { onDone() }
         }
@@ -119,7 +123,7 @@ class RoomDetailFragment : Fragment() {
         val rvKhach = v.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvKhachThueInRoom)
 
         if (danhSachKhachThue.isNotEmpty()) {
-            cardKhach.visibility = View.GONE // Ẩn cái card cũ chỉ hiện 1 người
+            cardKhach.visibility = View.GONE
             layoutEmpty.visibility = View.GONE
             rvKhach?.visibility = View.VISIBLE
             rvKhach?.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())

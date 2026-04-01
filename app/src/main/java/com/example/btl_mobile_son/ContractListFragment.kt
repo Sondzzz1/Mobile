@@ -48,9 +48,11 @@ class ContractListFragment : Fragment() {
                     .setMessage("Xóa hợp đồng #${hopDong.maHopDong}?")
                     .setPositiveButton("Xóa") { _, _ ->
                         CoroutineScope(Dispatchers.IO).launch {
-                            val dsKhach = dbManager.khachThueDao.layTheoPhong(hopDong.maPhong)
-                            for (k in dsKhach) {
-                                dbManager.khachThueDao.capNhat(k.copy(trangThai = "da_chuyen_di", maPhong = null))
+                            // Cập nhật trạng thái những người trong hợp đồng này sang "da_chuyen_di"
+                            // Sử dụng hopDongThanhVienDao vì khachThueDao không còn layTheoPhong
+                            val dsThanhVien = dbManager.hopDongThanhVienDao.layTheoHopDong(hopDong.maHopDong)
+                            for (tv in dsThanhVien) {
+                                dbManager.hopDongThanhVienDao.capNhat(tv.copy(trangThai = "da_chuyen_di", ngayRoiDi = System.currentTimeMillis()))
                             }
 
                             dbManager.hopDongDao.xoa(hopDong.maHopDong)

@@ -73,8 +73,8 @@ class CreateRoomFragment : Fragment() {
                 Toast.makeText(context, "Vui lòng nhập giá phòng", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            val gia = giaStr.toDoubleOrNull() ?: 0.0
-            if (!ValidationHelper.isValidAmount(gia)) {
+            val gia = giaStr.toLongOrNull() ?: 0L
+            if (!ValidationHelper.isValidAmount(gia.toDouble())) {
                 Toast.makeText(context, ValidationHelper.getAmountErrorMessage(), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }

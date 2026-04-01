@@ -157,8 +157,8 @@ class CreateDepositFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            val tienCoc = tienStr.toDoubleOrNull() ?: 0.0
-            if (!ValidationHelper.isValidAmount(tienCoc)) {
+            val tienCoc = tienStr.toLongOrNull() ?: 0L
+            if (!ValidationHelper.isValidAmount(tienCoc.toDouble())) {
                 Toast.makeText(context, ValidationHelper.getAmountErrorMessage(), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -214,7 +214,7 @@ class CreateDepositFragment : Fragment() {
                     soCmnd = cmnd,
                     email = "",
                     tienDatCoc = tienCoc,
-                    giaPhong = giaPhongStr.toDoubleOrNull() ?: 0.0,
+                    giaPhong = giaPhongStr.toLongOrNull() ?: 0L,
                     ngayDuKienVao = ngayDuKienVao,
                     ghiChu = etGhiChu.text.toString().trim()
                 )

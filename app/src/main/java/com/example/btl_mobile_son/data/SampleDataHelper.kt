@@ -50,7 +50,7 @@ class SampleDataHelper(private val context: Context) {
                 maNha = maNha1,
                 tenPhong = "Phòng 101",
                 dienTichM2 = 20f,
-                giaCoBan = 2500000.0,
+                giaCoBan = 2500000L,
                 trangThai = "da_thue",
                 soNguoiToiDa = 2,
                 ghiChu = "Phòng có ban công"
@@ -60,7 +60,7 @@ class SampleDataHelper(private val context: Context) {
                 maNha = maNha1,
                 tenPhong = "Phòng 102",
                 dienTichM2 = 18f,
-                giaCoBan = 2200000.0,
+                giaCoBan = 2200000L,
                 trangThai = "trong",
                 soNguoiToiDa = 2
             ))
@@ -69,7 +69,7 @@ class SampleDataHelper(private val context: Context) {
                 maNha = maNha1,
                 tenPhong = "Phòng 103",
                 dienTichM2 = 25f,
-                giaCoBan = 3000000.0,
+                giaCoBan = 3000000L,
                 trangThai = "da_thue",
                 soNguoiToiDa = 3,
                 ghiChu = "Phòng rộng, có gác lửng"
@@ -79,7 +79,7 @@ class SampleDataHelper(private val context: Context) {
                 maNha = maNha2,
                 tenPhong = "Phòng 201",
                 dienTichM2 = 22f,
-                giaCoBan = 2800000.0,
+                giaCoBan = 2800000L,
                 trangThai = "da_thue",
                 soNguoiToiDa = 2
             ))
@@ -88,7 +88,7 @@ class SampleDataHelper(private val context: Context) {
                 maNha = maNha2,
                 tenPhong = "Phòng 202",
                 dienTichM2 = 20f,
-                giaCoBan = 2600000.0,
+                giaCoBan = 2600000L,
                 trangThai = "trong",
                 soNguoiToiDa = 2
             ))
@@ -97,7 +97,7 @@ class SampleDataHelper(private val context: Context) {
                 maNha = maNha3,
                 tenPhong = "Phòng A1",
                 dienTichM2 = 15f,
-                giaCoBan = 1800000.0,
+                giaCoBan = 1800000L,
                 trangThai = "trong",
                 soNguoiToiDa = 1
             ))
@@ -138,8 +138,8 @@ class SampleDataHelper(private val context: Context) {
                 maKhach = khach1,
                 ngayBatDau = ngayBatDau1,
                 ngayKetThuc = ngayKetThuc1,
-                giaThueThang = 2500000.0,
-                tienDatCoc = 5000000.0,
+                giaThueThang = 2500000L,
+                tienDatCoc = 5000000L,
                 trangThai = "dang_thue"
             ))
 
@@ -154,8 +154,8 @@ class SampleDataHelper(private val context: Context) {
                 maKhach = khach2,
                 ngayBatDau = ngayBatDau2,
                 ngayKetThuc = ngayKetThuc2,
-                giaThueThang = 3000000.0,
-                tienDatCoc = 6000000.0,
+                giaThueThang = 3000000L,
+                tienDatCoc = 6000000L,
                 trangThai = "dang_thue"
             ))
 
@@ -170,8 +170,8 @@ class SampleDataHelper(private val context: Context) {
                 maKhach = khach3,
                 ngayBatDau = ngayBatDau3,
                 ngayKetThuc = ngayKetThuc3,
-                giaThueThang = 2800000.0,
-                tienDatCoc = 5600000.0,
+                giaThueThang = 2800000L,
+                tienDatCoc = 5600000L,
                 trangThai = "dang_thue"
             ))
 
@@ -180,7 +180,7 @@ class SampleDataHelper(private val context: Context) {
                 maNha = maNha1,
                 tenDichVu = "Điện",
                 donVi = "kWh",
-                donGia = 3500.0,
+                donGia = 3500L,
                 loaiDichVu = "dien"
             ))
 
@@ -188,7 +188,7 @@ class SampleDataHelper(private val context: Context) {
                 maNha = maNha1,
                 tenDichVu = "Nước",
                 donVi = "m³",
-                donGia = 20000.0,
+                donGia = 20000L,
                 loaiDichVu = "nuoc"
             ))
 
@@ -196,7 +196,7 @@ class SampleDataHelper(private val context: Context) {
                 maNha = maNha1,
                 tenDichVu = "Internet",
                 donVi = "tháng",
-                donGia = 100000.0,
+                donGia = 100000L,
                 loaiDichVu = "khac"
             ))
 
@@ -204,7 +204,7 @@ class SampleDataHelper(private val context: Context) {
                 maNha = maNha2,
                 tenDichVu = "Điện",
                 donVi = "kWh",
-                donGia = 3800.0,
+                donGia = 3800L,
                 loaiDichVu = "dien"
             ))
 
@@ -212,7 +212,7 @@ class SampleDataHelper(private val context: Context) {
                 maNha = maNha2,
                 tenDichVu = "Nước",
                 donVi = "m³",
-                donGia = 25000.0,
+                donGia = 25000L,
                 loaiDichVu = "nuoc"
             ))
 
@@ -226,9 +226,9 @@ class SampleDataHelper(private val context: Context) {
                 loai = "dien",
                 thang = thangHienTai,
                 nam = namHienTai,
-                chiSoCu = 100.0,
-                chiSoMoi = 150.0,
-                donGia = 3500.0,
+                chiSoCu = 100L,
+                chiSoMoi = 150L,
+                donGia = 3500L,
                 ghiChu = "Chỉ số tháng ${thangHienTai}"
             ))
 
@@ -237,9 +237,9 @@ class SampleDataHelper(private val context: Context) {
                 loai = "nuoc",
                 thang = thangHienTai,
                 nam = namHienTai,
-                chiSoCu = 10.0,
-                chiSoMoi = 15.0,
-                donGia = 20000.0
+                chiSoCu = 10L,
+                chiSoMoi = 15L,
+                donGia = 20000L
             ))
 
             // 7. Tạo hóa đơn mẫu
@@ -247,11 +247,12 @@ class SampleDataHelper(private val context: Context) {
                 maHopDong = hopDong1,
                 thang = thangHienTai,
                 nam = namHienTai,
-                tienPhong = 2500000.0,
-                tongTienDichVu = 275000.0, // 50kWh * 3500 + 5m³ * 20000
-                giamGia = 0.0,
-                tongTien = 2775000.0,
-                daThanhToan = false,
+                tienPhong = 2500000L,
+                tongTienDichVu = 275000L, // 50kWh * 3500 + 5m³ * 20000
+                giamGia = 0L,
+                tongTien = 2775000L,
+                tienDaThanhToan = 0L,
+                trangThai = "chua_thanh_toan",
                 ghiChu = "Hóa đơn tháng ${thangHienTai}/${namHienTai}"
             ))
 
@@ -260,11 +261,12 @@ class SampleDataHelper(private val context: Context) {
                 maHopDong = hopDong2,
                 thang = if (thangHienTai > 1) thangHienTai - 1 else 12,
                 nam = if (thangHienTai > 1) namHienTai else namHienTai - 1,
-                tienPhong = 3000000.0,
-                tongTienDichVu = 300000.0,
-                giamGia = 0.0,
-                tongTien = 3300000.0,
-                daThanhToan = true
+                tienPhong = 3000000L,
+                tongTienDichVu = 300000L,
+                giamGia = 0L,
+                tongTien = 3300000L,
+                tienDaThanhToan = 3300000L,
+                trangThai = "da_thanh_toan"
             ))
 
             // 8. Tạo giao dịch thu chi mẫu
@@ -274,7 +276,7 @@ class SampleDataHelper(private val context: Context) {
             dbManager.giaoDichDao.them(GiaoDich(
                 loai = "thu",
                 maPhong = phong101,
-                soTien = 2775000.0,
+                soTien = 2775000L,
                 danhMuc = "Tiền thuê phòng",
                 ngayGiaoDich = cal.timeInMillis,
                 noiDung = "Thu tiền phòng 101 tháng ${thangHienTai}",
@@ -285,7 +287,7 @@ class SampleDataHelper(private val context: Context) {
             cal.add(Calendar.DAY_OF_MONTH, -10)
             dbManager.giaoDichDao.them(GiaoDich(
                 loai = "chi",
-                soTien = 500000.0,
+                soTien = 500000L,
                 danhMuc = "Sửa chữa",
                 ngayGiaoDich = cal.timeInMillis,
                 noiDung = "Sửa ống nước phòng 102",
@@ -297,7 +299,7 @@ class SampleDataHelper(private val context: Context) {
             dbManager.giaoDichDao.them(GiaoDich(
                 loai = "thu",
                 maPhong = phong103,
-                soTien = 3300000.0,
+                soTien = 3300000L,
                 danhMuc = "Tiền thuê phòng",
                 ngayGiaoDich = cal.timeInMillis,
                 noiDung = "Thu tiền phòng 103",
@@ -315,8 +317,8 @@ class SampleDataHelper(private val context: Context) {
                 soDienThoai = "0954321098",
                 soCmnd = "079444555666",
                 email = "duc.pv@gmail.com",
-                tienDatCoc = 2000000.0,
-                giaPhong = 2200000.0,
+                tienDatCoc = 2000000L,
+                giaPhong = 2200000L,
                 ngayDuKienVao = cal.timeInMillis,
                 ghiChu = "Khách đặt cọc giữ phòng"
             ))

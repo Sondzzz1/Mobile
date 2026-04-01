@@ -101,10 +101,10 @@ class CreateTenantFragment : Fragment() {
                         CoroutineScope(Dispatchers.IO).launch {
                             val allPhong = dbManager.phongDao.layTheoNha(danhSachNha[pos].maNha)
                             
-                            // Lấy số người đang ở trong mỗi phòng
+                            // Lấy số người đang ở trong mỗi phòng via HopDongThanhVien
                             val phongVoiSoNguoi = allPhong.map { phong ->
-                                val soNguoiDangO = dbManager.khachThueDao.layTheoPhong(phong.maPhong)
-                                    .count { it.trangThai == "dang_o" }
+                                val hopDong = dbManager.hopDongDao.layHopDongDangThue(phong.maPhong)
+                                val soNguoiDangO = hopDong?.let { dbManager.hopDongThanhVienDao.demNguoiDangO(it.maHopDong) } ?: 0
                                 Pair(phong, soNguoiDangO)
                             }
                             
@@ -249,8 +249,8 @@ class CreateTenantFragment : Fragment() {
                     return@launch
                 }
                 
-                val soNguoiDangO = dbManager.khachThueDao.layTheoPhong(phong.maPhong)
-                    .count { it.trangThai == "dang_o" }
+                val hopDong = dbManager.hopDongDao.layHopDongDangThue(phong.maPhong)
+                val soNguoiDangO = hopDong?.let { dbManager.hopDongThanhVienDao.demNguoiDangO(it.maHopDong) } ?: 0
                 
                 // Kiểm tra phòng đã đủ người chưa (khi thêm mới)
                 if (maKhach <= 0 && soNguoiDangO >= phong.soNguoiToiDa) {
@@ -319,8 +319,6 @@ class CreateTenantFragment : Fragment() {
                         quanHuyen = etDistrict.text.toString().trim(),
                         xaPhuong = etWard.text.toString().trim(),
                         diaChiChiTiet = etDetailedAddress.text.toString().trim(),
-                        maPhong = phong.maPhong,
-                        trangThai = "dang_o",
                         ghiChu = etNote.text.toString().trim()
                     )
                     
@@ -425,7 +423,7 @@ class CreateTenantFragment : Fragment() {
         tvTenantIdCard.text = if (khach.soCmnd.isNotEmpty()) "CMND/CCCD: ${khach.soCmnd}" else "CMND/CCCD: Chưa có"
         tvRoomName.text = "Phòng: ${phong.tenPhong}"
         
-        // Ẩn cảnh báo roommate (không còn dùng)
+        // Ẩn cảnh báo roommate
         tvRoommateWarning.visibility = View.GONE
         
         // Set giá phòng mặc định
@@ -483,8 +481,8 @@ class CreateTenantFragment : Fragment() {
             
             btnPositive.setOnClickListener {
                 val duration = etDuration.text.toString().toIntOrNull() ?: 12
-                val deposit = etDeposit.text.toString().toDoubleOrNull() ?: 0.0
-                val price = etPrice.text.toString().toDoubleOrNull()
+                val deposit = etDeposit.text.toString().toLongOrNull() ?: 0L
+                val price = etPrice.text.toString().toLongOrNull()
                 val note = etContractNote.text.toString().trim()
                 
                 // Validation

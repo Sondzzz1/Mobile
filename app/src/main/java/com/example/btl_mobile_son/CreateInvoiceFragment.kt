@@ -2,8 +2,6 @@ package com.example.btl_mobile_son
 
 import android.app.DatePickerDialog
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,15 +28,15 @@ class CreateInvoiceFragment : Fragment() {
     private var namChon: Int = Calendar.getInstance().get(Calendar.YEAR)
 
     // Dữ liệu tính toán
-    private var tienPhong = 0.0
-    private var tienDichVu = 0.0
+    private var tienPhong = 0L
+    private var tienDichVu = 0L
     private var tenKhach = "--"
     private var tenPhong = "--"
     private var tenNha = "--"
 
-    private fun formatMoney(amount: Double): String {
+    private fun formatMoney(amount: Long): String {
         val formatter = NumberFormat.getNumberInstance(Locale("vi", "VN"))
-        return "${formatter.format(amount.toLong())}đ"
+        return "${formatter.format(amount)}đ"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -50,8 +48,6 @@ class CreateInvoiceFragment : Fragment() {
         dbManager = DatabaseManager.getInstance(requireContext())
 
         val spinnerContract = view.findViewById<Spinner>(R.id.spinnerContract)
-        val tvPhongInfo = view.findViewById<TextView>(R.id.tvPhongInfo)
-        val tvNhaInfo = view.findViewById<TextView>(R.id.tvNhaInfo)
         val etMonth = view.findViewById<EditText>(R.id.etMonth)
         val btnPreview = view.findViewById<Button>(R.id.btnPreview)
         val btnSubmit = view.findViewById<Button>(R.id.btnSubmit)
@@ -100,13 +96,11 @@ class CreateInvoiceFragment : Fragment() {
                         android.R.layout.simple_spinner_item,
                         listOf("Không có hợp đồng đang thuê")
                     )
-                    tvPhongInfo.text = "Phòng: --"
-                    tvNhaInfo.text = "Nhà: --"
                 } else {
                     spinnerContract.adapter = ArrayAdapter(
                         requireContext(),
                         android.R.layout.simple_spinner_item,
-                        danhSachHopDong.map { "HĐ #${it.maHopDong} - ${it.giaThueThang.toLong()}đ/tháng" }
+                        danhSachHopDong.map { "HĐ #${it.maHopDong} - ${formatMoney(it.giaThueThang)}/tháng" }
                     ).apply {
                         setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                     }
@@ -125,9 +119,6 @@ class CreateInvoiceFragment : Fragment() {
                                     tenPhong = phong?.tenPhong ?: "--"
                                     tenNha = nha?.tenNha ?: "--"
                                     tenKhach = khach?.hoTen ?: "--"
-                                    
-                                    tvPhongInfo.text = "Phòng: $tenPhong"
-                                    tvNhaInfo.text = "Nhà: $tenNha"
                                 }
                             }
                         }
@@ -166,7 +157,7 @@ class CreateInvoiceFragment : Fragment() {
                 val khachThue = dbManager.khachThueDao.layTheoMa(hopDong.maKhach)
 
                 // VĐ3: Tính tiền điện nước CHỈ từ chỉ số (không dùng dịch vụ)
-                var tongTienDichVu = 0.0
+                var tongTienDichVu = 0L
                 val chiSoDienNuoc = dbManager.chiSoDienNuocDao.layTheoThangNam(thangChon, namChon)
                     .filter { it.maPhong == phong?.maPhong }
 
@@ -175,7 +166,7 @@ class CreateInvoiceFragment : Fragment() {
                     tongTienDichVu += tien
                 }
 
-                val giamGia = etDiscount.text.toString().toDoubleOrNull() ?: 0.0
+                val giamGia = etDiscount.text.toString().toLongOrNull() ?: 0L
                 val tongTien = hopDong.giaThueThang + tongTienDichVu - giamGia
 
                 withContext(Dispatchers.Main) {
@@ -224,7 +215,7 @@ class CreateInvoiceFragment : Fragment() {
                 val phong = dbManager.phongDao.layTheoMa(hopDong.maPhong)
                 
                 // VĐ3: Tính tiền điện nước CHỈ từ chỉ số (không dùng dịch vụ)
-                var tongTienDichVu = 0.0
+                var tongTienDichVu = 0L
                 val chiSoDienNuoc = dbManager.chiSoDienNuocDao.layTheoThangNam(thangChon, namChon)
                     .filter { it.maPhong == phong?.maPhong }
 
@@ -233,7 +224,7 @@ class CreateInvoiceFragment : Fragment() {
                     tongTienDichVu += tien
                 }
 
-                val giamGia = etDiscount.text.toString().toDoubleOrNull() ?: 0.0
+                val giamGia = etDiscount.text.toString().toLongOrNull() ?: 0L
                 val tongTien = hopDong.giaThueThang + tongTienDichVu - giamGia
 
                 val hoaDon = HoaDon(
@@ -244,7 +235,8 @@ class CreateInvoiceFragment : Fragment() {
                     tongTienDichVu = tongTienDichVu,
                     giamGia = giamGia,
                     tongTien = tongTien,
-                    daThanhToan = false
+                    tienDaThanhToan = 0L,
+                    trangThai = "chua_thanh_toan"
                 )
                 
                 dbManager.hoaDonDao.them(hoaDon)

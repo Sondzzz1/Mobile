@@ -171,8 +171,8 @@ class CreateUtilityFragment : Fragment() {
                 Toast.makeText(context, "Nhập chỉ số mới", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            val chiSoCu = chiSoCuStr.toDoubleOrNull() ?: 0.0
-            val chiSoMoi = chiSoMoiStr.toDoubleOrNull() ?: 0.0
+            val chiSoCu = chiSoCuStr.toLongOrNull() ?: 0L
+            val chiSoMoi = chiSoMoiStr.toLongOrNull() ?: 0L
             if (chiSoMoi < chiSoCu) {
                 Toast.makeText(context, "Chỉ số mới phải lớn hơn hoặc bằng chỉ số cũ", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -181,8 +181,8 @@ class CreateUtilityFragment : Fragment() {
                 Toast.makeText(context, "Nhập đơn giá", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            val donGia = donGiaStr.toDoubleOrNull() ?: 0.0
-            if (!ValidationHelper.isValidAmount(donGia)) {
+            val donGia = donGiaStr.toLongOrNull() ?: 0L
+            if (!ValidationHelper.isValidAmount(donGia.toDouble())) {
                 Toast.makeText(context, ValidationHelper.getAmountErrorMessage(), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -210,7 +210,7 @@ class CreateUtilityFragment : Fragment() {
             CoroutineScope(Dispatchers.IO).launch {
                 // VĐ4: Kiểm tra trùng lặp - KHÔNG cho lưu trùng
                 val daTonTai = dbManager.chiSoDienNuocDao.kiemTraTrungChiSo(
-                    maPhong, loai, thang, nam, if (maChiSoEdit > 0) maChiSoEdit else null
+                    maPhong, loai, thang, nam, if (maChiSoEdit > 0) maChiSoEdit else -1
                 )
                 
                 if (daTonTai) {

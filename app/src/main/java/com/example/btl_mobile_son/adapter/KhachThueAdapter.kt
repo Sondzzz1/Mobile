@@ -32,9 +32,9 @@ class KhachThueAdapter(
         holder.tvHoTen.text = khach.hoTen
         holder.tvSdt.text = khach.soDienThoai.ifEmpty { "Chưa có SĐT" }
         
-        val statusText = if (khach.trangThai == "dang_o") "Đang ở" else "Đã chuyển đi"
-        val roomText = if (khach.maPhong != null) "Phòng ${khach.maPhong}" else "N/A"
-        holder.tvPhong.text = "$roomText - $statusText"
+        // Không hiển thị phòng và trạng thái vì đã bỏ khỏi model
+        holder.tvPhong.text = "Khách thuê"
+        
         // Lấy 2 chữ cái đầu làm avatar
         val initials = khach.hoTen.split(" ").takeLast(2).joinToString("") { it.first().toString() }
         holder.tvInitials.text = initials.uppercase()
