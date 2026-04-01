@@ -32,10 +32,17 @@ class TenantListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbManager = DatabaseManager.getInstance(requireContext())
+        try {
+            dbManager = DatabaseManager.getInstance(requireContext())
+        } catch (e: Exception) {
+            android.util.Log.e("TenantListFragment", "Error initializing database", e)
+            Toast.makeText(requireContext(), "Lỗi khởi tạo database", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         val rvTenantList = view.findViewById<RecyclerView>(R.id.rvTenantList)
         adapter = KhachThueAdapter(
+            danhSach = emptyList(),
             onItemClick = { khach ->
                 val fragment = CreateTenantFragment().apply {
                     arguments = Bundle().apply { putLong("maKhach", khach.maKhach) }
@@ -97,10 +104,17 @@ class TenantListFragment : Fragment() {
 
     private fun taiDuLieu(view: View) {
         CoroutineScope(Dispatchers.IO).launch {
-            val danhSach = dbManager.khachThueDao.layTatCa()
-            withContext(Dispatchers.Main) {
-                adapter.capNhatDanhSach(danhSach)
-                view.findViewById<TextView>(R.id.tvTenantCount)?.text = "${danhSach.size}"
+            try {
+                val danhSach = dbManager.khachThueDao.layTatCa()
+                withContext(Dispatchers.Main) {
+                    adapter.capNhatDanhSach(danhSach)
+                    view.findViewById<TextView>(R.id.tvTenantCount)?.text = "${danhSach.size}"
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("TenantListFragment", "Error loading data", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

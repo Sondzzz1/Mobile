@@ -31,11 +31,19 @@ class HouseListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbManager = DatabaseManager.getInstance(requireContext())
+        
+        try {
+            dbManager = DatabaseManager.getInstance(requireContext())
+        } catch (e: Exception) {
+            android.util.Log.e("HouseListFragment", "Error initializing database", e)
+            Toast.makeText(requireContext(), "Lỗi khởi tạo database", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         // Setup RecyclerView
         val rvHouseList = view.findViewById<RecyclerView>(R.id.rvHouseList)
         adapter = NhaTroAdapter(
+            danhSach = emptyList(),
             onItemClick = { nha ->
                 // Mở danh sách phòng của nhà này
                 val fragment = RoomListFragment().apply {
@@ -118,11 +126,18 @@ class HouseListFragment : Fragment() {
 
     private fun taiDuLieu(view: View) {
         CoroutineScope(Dispatchers.IO).launch {
-            val danhSach = dbManager.nhaTroDao.layTatCa()
-            withContext(Dispatchers.Main) {
-                adapter.capNhatDanhSach(danhSach)
-                view.findViewById<TextView>(R.id.tvManagingCount)?.text =
-                    "Bạn đang quản lý ${danhSach.size} nhà"
+            try {
+                val danhSach = dbManager.nhaTroDao.layTatCa()
+                withContext(Dispatchers.Main) {
+                    adapter.capNhatDanhSach(danhSach)
+                    view.findViewById<TextView>(R.id.tvManagingCount)?.text =
+                        "Bạn đang quản lý ${danhSach.size} nhà"
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("HouseListFragment", "Error loading data", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

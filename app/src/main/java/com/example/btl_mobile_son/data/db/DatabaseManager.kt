@@ -6,8 +6,14 @@ import com.example.btl_mobile_son.data.dao.*
 
 class DatabaseManager private constructor(context: Context) {
     
+    init {
+        android.util.Log.d("DatabaseManager", "Initializing DatabaseManager...")
+    }
+    
     private val dbHelper: DatabaseHelper = DatabaseHelper(context)
-    private val database: SQLiteDatabase = dbHelper.writableDatabase
+    private val database: SQLiteDatabase = dbHelper.writableDatabase.also {
+        android.util.Log.d("DatabaseManager", "Database opened successfully")
+    }
 
     // Các DAO
     val nhaTroDao: NhaTroDao by lazy { NhaTroDao(database) }

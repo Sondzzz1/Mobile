@@ -32,7 +32,13 @@ class DepositListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbManager = DatabaseManager.getInstance(requireContext())
+        try {
+            dbManager = DatabaseManager.getInstance(requireContext())
+        } catch (e: Exception) {
+            android.util.Log.e("DepositListFragment", "Error initializing database", e)
+            Toast.makeText(requireContext(), "Lỗi khởi tạo database", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         // Layout dùng rvDepositList và tvTotalDeposit
         val recyclerView = view.findViewById<RecyclerView>(R.id.rvDepositList)
@@ -104,12 +110,19 @@ class DepositListFragment : Fragment() {
 
     private fun taiDuLieu(recyclerView: RecyclerView, tvTotal: TextView?) {
         CoroutineScope(Dispatchers.IO).launch {
-            val ds = dbManager.datCocDao.layTatCa()
-            val tong = dbManager.datCocDao.tinhTongDatCoc()
-            withContext(Dispatchers.Main) {
-                adapter.capNhatDanhSach(ds)
-                val fmt = NumberFormat.getNumberInstance(Locale("vi", "VN"))
-                tvTotal?.text = "${fmt.format(tong)} d"
+            try {
+                val ds = dbManager.datCocDao.layTatCa()
+                val tong = dbManager.datCocDao.tinhTongDatCoc()
+                withContext(Dispatchers.Main) {
+                    adapter.capNhatDanhSach(ds)
+                    val fmt = NumberFormat.getNumberInstance(Locale("vi", "VN"))
+                    tvTotal?.text = "${fmt.format(tong)} d"
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("DepositListFragment", "Error loading data", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

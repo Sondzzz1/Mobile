@@ -34,7 +34,13 @@ class CreateContractFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbManager = DatabaseManager.getInstance(requireContext())
+        try {
+            dbManager = DatabaseManager.getInstance(requireContext())
+        } catch (e: Exception) {
+            android.util.Log.e("CreateContractFragment", "Error initializing database", e)
+            Toast.makeText(requireContext(), "Lỗi khởi tạo database", Toast.LENGTH_SHORT).show()
+            return
+        }
         maHopDongEdit = arguments?.getLong("maHopDong", -1L) ?: -1L
 
         val spinnerHouse = view.findViewById<Spinner>(R.id.spinnerHouse)

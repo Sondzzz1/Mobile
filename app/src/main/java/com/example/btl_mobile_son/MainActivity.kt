@@ -25,12 +25,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         // Load sample data lần đầu
         lifecycleScope.launch {
-            SampleDataHelper(this@MainActivity).loadSampleDataIfNeeded()
-            
-            // Cập nhật trạng thái hợp đồng hết hạn
-            withContext(Dispatchers.IO) {
-                val dbManager = com.example.btl_mobile_son.data.db.DatabaseManager.getInstance(this@MainActivity)
-                dbManager.hopDongDao.capNhatHopDongHetHan()
+            try {
+                SampleDataHelper(this@MainActivity).loadSampleDataIfNeeded()
+                
+                // Cập nhật trạng thái hợp đồng hết hạn
+                withContext(Dispatchers.IO) {
+                    val dbManager = com.example.btl_mobile_son.data.db.DatabaseManager.getInstance(this@MainActivity)
+                    dbManager.hopDongDao.capNhatHopDongHetHan()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                android.util.Log.e("MainActivity", "Error loading data", e)
             }
         }
 

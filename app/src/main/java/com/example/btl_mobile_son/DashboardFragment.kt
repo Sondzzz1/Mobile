@@ -24,7 +24,16 @@ class DashboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbManager = DatabaseManager.getInstance(requireContext())
+        android.util.Log.d("DashboardFragment", "onViewCreated started")
+        
+        try {
+            dbManager = DatabaseManager.getInstance(requireContext())
+            android.util.Log.d("DashboardFragment", "DatabaseManager initialized successfully")
+        } catch (e: Exception) {
+            android.util.Log.e("DashboardFragment", "Error initializing DatabaseManager", e)
+            e.printStackTrace()
+            return
+        }
 
         // Nút tạo dịch vụ
         view.findViewById<View>(R.id.btnCreateService)?.setOnClickListener {
@@ -107,36 +116,47 @@ class DashboardFragment : Fragment() {
         val tvMonthRevenue = view.findViewById<TextView>(R.id.tvMonthRevenue)
 
         CoroutineScope(Dispatchers.IO).launch {
-            // Thống kê phòng
-            val tatCaPhong = dbManager.phongDao.layTatCa()
-            val phongDaThue = tatCaPhong.count { it.trangThai == "da_thue" }
-            val tongPhong = tatCaPhong.size
+            try {
+                // Thống kê phòng
+                val tatCaPhong = dbManager.phongDao.layTatCa()
+                val phongDaThue = tatCaPhong.count { it.trangThai == "da_thue" }
+                val tongPhong = tatCaPhong.size
 
-            // Thống kê khách thuê
-            val soKhach = dbManager.khachThueDao.layTatCa().size
+                // Thống kê khách thuê
+                val soKhach = dbManager.khachThueDao.layTatCa().size
 
-            // Hóa đơn chưa thanh toán
-            val hoaDonChuaTT = dbManager.hoaDonDao.layTatCa().count { it.trangThai != "da_thanh_toan" }
+                // Hóa đơn chưa thanh toán
+                val hoaDonChuaTT = dbManager.hoaDonDao.layTatCa().count { it.trangThai != "da_thanh_toan" }
 
-            // Doanh thu tháng này
-            val calendar = Calendar.getInstance()
-            val thangHienTai = calendar.get(Calendar.MONTH) + 1
-            val namHienTai = calendar.get(Calendar.YEAR)
-            
-            val doanhThuThang = dbManager.giaoDichDao.layTatCa()
-                .filter { giaoDich ->
-                    if (giaoDich.loai != "thu") return@filter false
-                    val calGD = Calendar.getInstance()
-                    calGD.timeInMillis = giaoDich.ngayGiaoDich
-                    calGD.get(Calendar.MONTH) + 1 == thangHienTai && calGD.get(Calendar.YEAR) == namHienTai
+                // Doanh thu tháng này
+                val calendar = Calendar.getInstance()
+                val thangHienTai = calendar.get(Calendar.MONTH) + 1
+                val namHienTai = calendar.get(Calendar.YEAR)
+                
+                val doanhThuThang = dbManager.giaoDichDao.layTatCa()
+                    .filter { giaoDich ->
+                        if (giaoDich.loai != "thu") return@filter false
+                        val calGD = Calendar.getInstance()
+                        calGD.timeInMillis = giaoDich.ngayGiaoDich
+                        calGD.get(Calendar.MONTH) + 1 == thangHienTai && calGD.get(Calendar.YEAR) == namHienTai
+                    }
+                    .sumOf { it.soTien }
+
+                withContext(Dispatchers.Main) {
+                    tvRoomStats?.text = "$phongDaThue/$tongPhong"
+                    tvTenantCount?.text = "$soKhach"
+                    tvUnpaidInvoice?.text = "$hoaDonChuaTT"
+                    tvMonthRevenue?.text = "${String.format("%,.0f", doanhThuThang.toDouble())}đ"
                 }
-                .sumOf { it.soTien }
-
-            withContext(Dispatchers.Main) {
-                tvRoomStats?.text = "$phongDaThue/$tongPhong"
-                tvTenantCount?.text = "$soKhach"
-                tvUnpaidInvoice?.text = "$hoaDonChuaTT"
-                tvMonthRevenue?.text = "${String.format("%,.0f", doanhThuThang)}đ"
+            } catch (e: Exception) {
+                android.util.Log.e("DashboardFragment", "Error loading statistics", e)
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    tvRoomStats?.text = "0/0"
+                    tvTenantCount?.text = "0"
+                    tvUnpaidInvoice?.text = "0"
+                    tvMonthRevenue?.text = "0đ"
+                }
             }
         }
     }

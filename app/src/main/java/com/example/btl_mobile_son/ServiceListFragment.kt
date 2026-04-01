@@ -32,7 +32,13 @@ class ServiceListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbManager = DatabaseManager.getInstance(requireContext())
+        try {
+            dbManager = DatabaseManager.getInstance(requireContext())
+        } catch (e: Exception) {
+            android.util.Log.e("ServiceListFragment", "Error initializing database", e)
+            Toast.makeText(requireContext(), "Lỗi khởi tạo database", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerService)
         val tvEmpty = view.findViewById<TextView>(R.id.tvEmpty)
@@ -88,13 +94,20 @@ class ServiceListFragment : Fragment() {
 
     private fun taiDuLieu(recyclerView: RecyclerView, tvEmpty: TextView) {
         CoroutineScope(Dispatchers.IO).launch {
-            val ds = dbManager.dichVuDao.layTatCa()
-            withContext(Dispatchers.Main) {
-                danhSach.clear()
-                danhSach.addAll(ds)
-                adapter.notifyDataSetChanged()
-                tvEmpty.visibility = if (ds.isEmpty()) View.VISIBLE else View.GONE
-                recyclerView.visibility = if (ds.isEmpty()) View.GONE else View.VISIBLE
+            try {
+                val ds = dbManager.dichVuDao.layTatCa()
+                withContext(Dispatchers.Main) {
+                    danhSach.clear()
+                    danhSach.addAll(ds)
+                    adapter.notifyDataSetChanged()
+                    tvEmpty.visibility = if (ds.isEmpty()) View.VISIBLE else View.GONE
+                    recyclerView.visibility = if (ds.isEmpty()) View.GONE else View.VISIBLE
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("ServiceListFragment", "Error loading data", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

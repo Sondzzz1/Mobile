@@ -30,7 +30,7 @@ class DatCocAdapter(
         val dc = danhSach[position]
         holder.tvTenKhach.text = dc.tenKhach
         holder.tvPhong.text = "Phòng #${dc.maPhong} | ${dc.soDienThoai}"
-        holder.tvTien.text = "${String.format("%,.0f", dc.tienDatCoc)} đ"
+        holder.tvTien.text = "${String.format("%,.0f", dc.tienDatCoc.toDouble())} đ"
         val initials = dc.tenKhach.split(" ").takeLast(2).joinToString("") { it.first().toString() }
         holder.tvInitials.text = initials.uppercase()
         holder.itemView.setOnClickListener { onItemClick(dc) }

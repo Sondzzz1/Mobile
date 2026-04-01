@@ -33,7 +33,7 @@ class PhongAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val phong = danhSach[position]
         holder.tvTenPhong.text = phong.tenPhong
-        holder.tvGia.text = "${String.format("%,.0f", phong.giaCoBan)} đ/tháng"
+        holder.tvGia.text = "${String.format("%,.0f", phong.giaCoBan.toDouble())} đ/tháng"
         if (phong.trangThai == "trong") {
             holder.tvTrangThai.text = "Còn trống"
             holder.tvTrangThai.setTextColor(Color.parseColor("#4CAF50"))

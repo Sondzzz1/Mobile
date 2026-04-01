@@ -31,10 +31,17 @@ class InvoiceListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbManager = DatabaseManager.getInstance(requireContext())
+        try {
+            dbManager = DatabaseManager.getInstance(requireContext())
+        } catch (e: Exception) {
+            android.util.Log.e("InvoiceListFragment", "Error initializing database", e)
+            Toast.makeText(requireContext(), "Lỗi khởi tạo database", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         val rvInvoiceList = view.findViewById<RecyclerView>(R.id.rvInvoiceList)
         adapter = HoaDonAdapter(
+            danhSach = emptyList(),
             onItemClick = { hoaDon ->
                 val statusText = when (hoaDon.trangThai) {
                     "da_thanh_toan" -> "Đã thanh toán"
@@ -44,7 +51,7 @@ class InvoiceListFragment : Fragment() {
                 }
                 AlertDialog.Builder(requireContext())
                     .setTitle("Hóa đơn tháng ${hoaDon.thang}/${hoaDon.nam}")
-                    .setMessage("Tổng tiền: ${String.format("%,.0f", hoaDon.tongTien)} đ\nTrạng thái: $statusText")
+                    .setMessage("Tổng tiền: ${String.format("%,.0f", hoaDon.tongTien.toDouble())} đ\nTrạng thái: $statusText")
                     .setPositiveButton(if (hoaDon.trangThai == "da_thanh_toan") "Đóng" else "Đánh dấu đã TT") { _, _ ->
                         if (hoaDon.trangThai != "da_thanh_toan") {
                             CoroutineScope(Dispatchers.IO).launch {
@@ -120,12 +127,19 @@ class InvoiceListFragment : Fragment() {
         val thang = cal.get(Calendar.MONTH) + 1
         val nam = cal.get(Calendar.YEAR)
         CoroutineScope(Dispatchers.IO).launch {
-            val danhSach = dbManager.hoaDonDao.layTatCa()
-            val tongChuaTT = dbManager.hoaDonDao.tinhTongChuaThanhToan()
-            withContext(Dispatchers.Main) {
-                adapter.capNhatDanhSach(danhSach)
-                view.findViewById<TextView>(R.id.tvTotalInvoices)?.text = "Tổng tiền (${danhSach.size} hóa đơn)"
-                view.findViewById<TextView>(R.id.tvTotalAmount)?.text = "${String.format("%,.0f", tongChuaTT)} đ"
+            try {
+                val danhSach = dbManager.hoaDonDao.layTatCa()
+                val tongChuaTT = dbManager.hoaDonDao.tinhTongChuaThanhToan()
+                withContext(Dispatchers.Main) {
+                    adapter.capNhatDanhSach(danhSach)
+                    view.findViewById<TextView>(R.id.tvTotalInvoices)?.text = "Tổng tiền (${danhSach.size} hóa đơn)"
+                    view.findViewById<TextView>(R.id.tvTotalAmount)?.text = "${String.format("%,.0f", tongChuaTT.toDouble())} đ"
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("InvoiceListFragment", "Error loading data", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

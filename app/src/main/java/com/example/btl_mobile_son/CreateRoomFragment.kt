@@ -29,9 +29,22 @@ class CreateRoomFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbManager = DatabaseManager.getInstance(requireContext())
+        try {
+            dbManager = DatabaseManager.getInstance(requireContext())
+        } catch (e: Exception) {
+            android.util.Log.e("CreateRoomFragment", "Error initializing database", e)
+            Toast.makeText(requireContext(), "Lỗi khởi tạo database", Toast.LENGTH_SHORT).show()
+            return
+        }
         maNha = arguments?.getLong("maNha", -1L) ?: -1L
         maPhong = arguments?.getLong("maPhong", -1L) ?: -1L
+        
+        // Kiểm tra maNha hợp lệ khi tạo mới
+        if (maNha <= 0 && maPhong <= 0) {
+            Toast.makeText(context, "⚠️ Lỗi: Không xác định được nhà trọ!\nVui lòng chọn nhà trước.", Toast.LENGTH_LONG).show()
+            requireActivity().onBackPressed()
+            return
+        }
 
         val etTenPhong = view.findViewById<EditText>(R.id.etRoomName)
         val etGia = view.findViewById<EditText>(R.id.etRoomPrice)
@@ -45,6 +58,10 @@ class CreateRoomFragment : Fragment() {
                 val phong = dbManager.phongDao.layTheoMa(maPhong)
                 withContext(Dispatchers.Main) {
                     phong?.let {
+                        // Cập nhật maNha từ phòng hiện tại nếu chưa có
+                        if (maNha <= 0) {
+                            maNha = it.maNha
+                        }
                         etTenPhong.setText(it.tenPhong)
                         etGia.setText(it.giaCoBan.toLong().toString())
                         etDienTich.setText(it.dienTichM2.toString())
@@ -87,6 +104,14 @@ class CreateRoomFragment : Fragment() {
             }
 
             CoroutineScope(Dispatchers.IO).launch {
+                // Kiểm tra maNha hợp lệ
+                if (maNha <= 0) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "⚠️ Lỗi: Không xác định được nhà trọ!", Toast.LENGTH_LONG).show()
+                    }
+                    return@launch
+                }
+                
                 // Kiểm tra trùng tên phòng trong cùng nhà
                 if (dbManager.phongDao.kiemTraTrungTen(maNha, tenPhong, maPhong)) {
                     withContext(Dispatchers.Main) {

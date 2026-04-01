@@ -32,11 +32,19 @@ class RoomListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbManager = DatabaseManager.getInstance(requireContext())
+        
+        try {
+            dbManager = DatabaseManager.getInstance(requireContext())
+        } catch (e: Exception) {
+            android.util.Log.e("RoomListFragment", "Error initializing database", e)
+            Toast.makeText(requireContext(), "Lỗi khởi tạo database", Toast.LENGTH_SHORT).show()
+            return
+        }
         maNha = arguments?.getLong("maNha", -1L) ?: -1L
 
         val rvRoomList = view.findViewById<RecyclerView>(R.id.rvRoomList)
         adapter = PhongAdapter(
+            danhSach = emptyList(),
             onItemClick = { phong ->
                 val fragment = RoomDetailFragment().apply {
                     arguments = Bundle().apply { putLong("maPhong", phong.maPhong) }
@@ -48,7 +56,7 @@ class RoomListFragment : Fragment() {
             onEditClick = { phong ->
                 val fragment = CreateRoomFragment().apply {
                     arguments = Bundle().apply {
-                        putLong("maNha", maNha)
+                        putLong("maNha", phong.maNha)
                         putLong("maPhong", phong.maPhong)
                     }
                 }
@@ -76,12 +84,20 @@ class RoomListFragment : Fragment() {
         }
 
         view.findViewById<Button>(R.id.btnAddRoom).setOnClickListener {
-            val fragment = CreateRoomFragment().apply {
-                arguments = Bundle().apply { putLong("maNha", maNha) }
+            if (maNha <= 0) {
+                // Nếu không có maNha, chuyển đến danh sách nhà để chọn
+                Toast.makeText(context, "Vui lòng chọn nhà trước khi thêm phòng", Toast.LENGTH_LONG).show()
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, HouseListFragment())
+                    .addToBackStack(null).commit()
+            } else {
+                val fragment = CreateRoomFragment().apply {
+                    arguments = Bundle().apply { putLong("maNha", maNha) }
+                }
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null).commit()
             }
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .addToBackStack(null).commit()
         }
 
         taiDuLieu(view)
@@ -94,11 +110,29 @@ class RoomListFragment : Fragment() {
 
     private fun taiDuLieu(view: View) {
         CoroutineScope(Dispatchers.IO).launch {
-            val danhSach = if (maNha > 0) dbManager.phongDao.layTheoNha(maNha)
-                           else dbManager.phongDao.layTatCa()
-            withContext(Dispatchers.Main) {
-                adapter.capNhatDanhSach(danhSach)
-                view.findViewById<TextView>(R.id.tvRoomCount)?.text = "${danhSach.size} phòng"
+            try {
+                val danhSach = if (maNha > 0) {
+                    dbManager.phongDao.layTheoNha(maNha)
+                } else {
+                    dbManager.phongDao.layTatCa()
+                }
+                
+                // Lấy tên nhà nếu có maNha
+                val tenNha = if (maNha > 0) {
+                    dbManager.nhaTroDao.layTheoMa(maNha)?.tenNha ?: "Nhà trọ"
+                } else {
+                    "Tất cả nhà"
+                }
+                
+                withContext(Dispatchers.Main) {
+                    adapter.capNhatDanhSach(danhSach)
+                    view.findViewById<TextView>(R.id.tvRoomCount)?.text = "$tenNha - ${danhSach.size} phòng"
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("RoomListFragment", "Error loading data", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

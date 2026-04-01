@@ -34,7 +34,13 @@ class ExpenseListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbManager = DatabaseManager.getInstance(requireContext())
+        try {
+            dbManager = DatabaseManager.getInstance(requireContext())
+        } catch (e: Exception) {
+            android.util.Log.e("ExpenseListFragment", "Error initializing database", e)
+            Toast.makeText(requireContext(), "Lỗi khởi tạo database", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerExpense)
         val tvEmpty = view.findViewById<TextView>(R.id.tvEmpty)
@@ -92,16 +98,23 @@ class ExpenseListFragment : Fragment() {
 
     private fun taiDuLieu(recyclerView: RecyclerView, tvEmpty: TextView, tvTong: TextView) {
         CoroutineScope(Dispatchers.IO).launch {
-            val ds = dbManager.giaoDichDao.layTheoLoai("chi")
-            val tong = dbManager.giaoDichDao.tinhTongTheoLoai("chi")
-            withContext(Dispatchers.Main) {
-                danhSach.clear()
-                danhSach.addAll(ds)
-                adapter.notifyDataSetChanged()
-                tvEmpty.visibility = if (ds.isEmpty()) View.VISIBLE else View.GONE
-                recyclerView.visibility = if (ds.isEmpty()) View.GONE else View.VISIBLE
-                val fmt = NumberFormat.getNumberInstance(Locale("vi", "VN"))
-                tvTong.text = "Tổng chi: ${fmt.format(tong)} đ"
+            try {
+                val ds = dbManager.giaoDichDao.layTheoLoai("chi")
+                val tong = dbManager.giaoDichDao.tinhTongTheoLoai("chi")
+                withContext(Dispatchers.Main) {
+                    danhSach.clear()
+                    danhSach.addAll(ds)
+                    adapter.notifyDataSetChanged()
+                    tvEmpty.visibility = if (ds.isEmpty()) View.VISIBLE else View.GONE
+                    recyclerView.visibility = if (ds.isEmpty()) View.GONE else View.VISIBLE
+                    val fmt = NumberFormat.getNumberInstance(Locale("vi", "VN"))
+                    tvTong.text = "Tổng chi: ${fmt.format(tong)} đ"
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("ExpenseListFragment", "Error loading data", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

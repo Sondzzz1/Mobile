@@ -37,7 +37,7 @@ class HopDongAdapter(
         holder.tvTenantName.text = "Hợp đồng #${hd.maHopDong}"
         holder.tvDateIn.text = sdf.format(Date(hd.ngayBatDau))
         holder.tvDateOut.text = sdf.format(Date(hd.ngayKetThuc))
-        holder.tvRoomInfo.text = "Phòng #${hd.maPhong} | ${String.format("%,.0f", hd.giaThueThang)} đ/tháng"
+        holder.tvRoomInfo.text = "Phòng #${hd.maPhong} | ${String.format("%,.0f", hd.giaThueThang.toDouble())} đ/tháng"
         holder.tvStatus.text = when (hd.trangThai) {
             "dang_thue" -> "Đang thuê"
             "het_han" -> "Hết hạn"

@@ -30,7 +30,13 @@ class CreateExpenseFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbManager = DatabaseManager.getInstance(requireContext())
+        try {
+            dbManager = DatabaseManager.getInstance(requireContext())
+        } catch (e: Exception) {
+            android.util.Log.e("CreateExpenseFragment", "Error initializing database", e)
+            Toast.makeText(requireContext(), "Lỗi khởi tạo database", Toast.LENGTH_SHORT).show()
+            return
+        }
         maGiaoDichEdit = arguments?.getLong("maGiaoDich", -1L) ?: -1L
 
         val etSoTien = view.findViewById<EditText>(R.id.etSoTien)

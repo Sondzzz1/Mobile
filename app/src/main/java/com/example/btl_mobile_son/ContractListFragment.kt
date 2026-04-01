@@ -30,10 +30,17 @@ class ContractListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbManager = DatabaseManager.getInstance(requireContext())
+        try {
+            dbManager = DatabaseManager.getInstance(requireContext())
+        } catch (e: Exception) {
+            android.util.Log.e("ContractListFragment", "Error initializing database", e)
+            Toast.makeText(requireContext(), "Lỗi khởi tạo database", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         val rvContractList = view.findViewById<RecyclerView>(R.id.rvContractList)
         adapter = HopDongAdapter(
+            danhSach = emptyList(),
             onItemClick = { hopDong ->
                 val fragment = CreateContractFragment().apply {
                     arguments = Bundle().apply { putLong("maHopDong", hopDong.maHopDong) }
@@ -96,10 +103,17 @@ class ContractListFragment : Fragment() {
 
     private fun taiDuLieu(view: View) {
         CoroutineScope(Dispatchers.IO).launch {
-            val danhSach = dbManager.hopDongDao.layTatCa()
-            withContext(Dispatchers.Main) {
-                adapter.capNhatDanhSach(danhSach)
-                view.findViewById<TextView>(R.id.tvContractCount)?.text = "${danhSach.size}"
+            try {
+                val danhSach = dbManager.hopDongDao.layTatCa()
+                withContext(Dispatchers.Main) {
+                    adapter.capNhatDanhSach(danhSach)
+                    view.findViewById<TextView>(R.id.tvContractCount)?.text = "${danhSach.size}"
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("ContractListFragment", "Error loading data", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

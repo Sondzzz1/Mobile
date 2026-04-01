@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.btl_mobile_son.data.db.DatabaseManager
 import com.example.btl_mobile_son.data.model.HopDong
@@ -45,7 +46,13 @@ class RoomDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dbManager = DatabaseManager.getInstance(requireContext())
+        try {
+            dbManager = DatabaseManager.getInstance(requireContext())
+        } catch (e: Exception) {
+            android.util.Log.e("RoomDetailFragment", "Error initializing database", e)
+            Toast.makeText(requireContext(), "Lỗi khởi tạo database", Toast.LENGTH_SHORT).show()
+            return
+        }
         maPhong = arguments?.getLong("maPhong", -1L) ?: -1L
 
         view.findViewById<ImageView>(R.id.btnBack).setOnClickListener {
@@ -76,18 +83,26 @@ class RoomDetailFragment : Fragment() {
     private fun taiDuLieu(onDone: () -> Unit) {
         if (maPhong < 0) { onDone(); return }
         CoroutineScope(Dispatchers.IO).launch {
-            phong = dbManager.phongDao.layTheoMa(maPhong)
-            phong?.let { p ->
-                nha = dbManager.nhaTroDao.layTheoMa(p.maNha)
+            try {
+                phong = dbManager.phongDao.layTheoMa(maPhong)
+                phong?.let { p ->
+                    nha = dbManager.nhaTroDao.layTheoMa(p.maNha)
+                }
+                hopDongHienTai = dbManager.hopDongDao.layHopDongDangThue(maPhong)
+                
+                // Lấy danh sách khách thuê đang ở trong phòng từ hợp đồng hiện tại
+                val tvs = hopDongHienTai?.let { dbManager.hopDongThanhVienDao.layNguoiDangOTheoHopDong(it.maHopDong) } ?: emptyList()
+                danhSachKhachThue = tvs.mapNotNull { tv -> dbManager.khachThueDao.layTheoMa(tv.maKhach) }
+                
+                lichSuHopDong = dbManager.hopDongDao.layTheoPhong(maPhong)
+                withContext(Dispatchers.Main) { onDone() }
+            } catch (e: Exception) {
+                android.util.Log.e("RoomDetailFragment", "Error loading data", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show()
+                    onDone()
+                }
             }
-            hopDongHienTai = dbManager.hopDongDao.layHopDongDangThue(maPhong)
-            
-            // Lấy danh sách khách thuê đang ở trong phòng từ hợp đồng hiện tại
-            val tvs = hopDongHienTai?.let { dbManager.hopDongThanhVienDao.layNguoiDangOTheoHopDong(it.maHopDong) } ?: emptyList()
-            danhSachKhachThue = tvs.mapNotNull { tv -> dbManager.khachThueDao.layTheoMa(tv.maKhach) }
-            
-            lichSuHopDong = dbManager.hopDongDao.layTheoPhong(maPhong)
-            withContext(Dispatchers.Main) { onDone() }
         }
     }
 
@@ -98,7 +113,7 @@ class RoomDetailFragment : Fragment() {
         phong?.let { p ->
             v.findViewById<TextView>(R.id.tvTenNha)?.text = nha?.tenNha ?: "--"
             v.findViewById<TextView>(R.id.tvTenPhong)?.text = p.tenPhong
-            v.findViewById<TextView>(R.id.tvGiaCoBan)?.text = "${String.format("%,.0f", p.giaCoBan)} đ/tháng"
+            v.findViewById<TextView>(R.id.tvGiaCoBan)?.text = "${String.format("%,.0f", p.giaCoBan.toDouble())} đ/tháng"
             v.findViewById<TextView>(R.id.tvDienTich)?.text = "${p.dienTichM2} m²"
             v.findViewById<TextView>(R.id.tvSoNguoi)?.text = "${p.soNguoiToiDa} người"
             val tvTrangThai = v.findViewById<TextView>(R.id.tvTrangThai)
@@ -163,8 +178,8 @@ class RoomDetailFragment : Fragment() {
             val hd = hopDongHienTai!!
             v.findViewById<TextView>(R.id.tvNgayBatDau)?.text = sdf.format(Date(hd.ngayBatDau))
             v.findViewById<TextView>(R.id.tvNgayKetThuc)?.text = sdf.format(Date(hd.ngayKetThuc))
-            v.findViewById<TextView>(R.id.tvGiaThue)?.text = "${String.format("%,.0f", hd.giaThueThang)} đ/tháng"
-            v.findViewById<TextView>(R.id.tvTienCoc)?.text = "${String.format("%,.0f", hd.tienDatCoc)} đ"
+            v.findViewById<TextView>(R.id.tvGiaThue)?.text = "${String.format("%,.0f", hd.giaThueThang.toDouble())} đ/tháng"
+            v.findViewById<TextView>(R.id.tvTienCoc)?.text = "${String.format("%,.0f", hd.tienDatCoc.toDouble())} đ"
             val tvTrangThai = v.findViewById<TextView>(R.id.tvTrangThaiHD)
             tvTrangThai?.text = when (hd.trangThai) {
                 "dang_thue" -> "Đang thuê"

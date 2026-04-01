@@ -33,9 +33,9 @@ class HoaDonAdapter(
         val hd = danhSach[position]
         holder.tvTenantName.text = "Hóa đơn tháng ${hd.thang}/${hd.nam}"
         holder.tvRoomInfo.text = "Hợp đồng #${hd.maHopDong}"
-        holder.tvAmount.text = "${String.format("%,.0f", hd.tongTien)} đ"
-        holder.tvRoomCost.text = "${String.format("%,.0f", hd.tienPhong)} đ"
-        holder.tvServiceCost.text = "${String.format("%,.0f", hd.tongTienDichVu)} đ"
+        holder.tvAmount.text = "${String.format("%,.0f", hd.tongTien.toDouble())} đ"
+        holder.tvRoomCost.text = "${String.format("%,.0f", hd.tienPhong.toDouble())} đ"
+        holder.tvServiceCost.text = "${String.format("%,.0f", hd.tongTienDichVu.toDouble())} đ"
         when (hd.trangThai) {
             "da_thanh_toan" -> {
                 holder.tvStatus.text = "Đã thanh toán"
