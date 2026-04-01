@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardHopDongHienTai"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="HỢP ĐỒNG HIỆN TẠI"
+                android:textStyle="bold"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp"
+                android:layout_marginBottom="12dp"/>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="10dp">
+                <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="Ngày bắt đầu" android:textColor="@color/textSecondary" android:textSize="15sp"/>
+                <TextView android:id="@+id/tvNgayBatDau" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--" android:textColor="@color/textPrimary" android:textSize="15sp" android:textStyle="bold"/>
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="10dp"/>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="10dp">
+                <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="Ngày kết thúc" android:textColor="@color/textSecondary" android:textSize="15sp"/>
+                <TextView android:id="@+id/tvNgayKetThuc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--" android:textColor="@color/textPrimary" android:textSize="15sp" android:textStyle="bold"/>
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="10dp"/>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="10dp">
+                <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="Giá thuê/tháng" android:textColor="@color/textSecondary" android:textSize="15sp"/>
+                <TextView android:id="@+id/tvGiaThue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--" android:textColor="@color/textPrimary" android:textSize="15sp" android:textStyle="bold"/>
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="10dp"/>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="10dp">
+                <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="Tiền đặt cọc" android:textColor="@color/textSecondary" android:textSize="15sp"/>
+                <TextView android:id="@+id/tvTienCoc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--" android:textColor="@color/textPrimary" android:textSize="15sp" android:textStyle="bold"/>
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginBottom="10dp"/>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="Trạng thái" android:textColor="@color/textSecondary" android:textSize="15sp"/>
+                <TextView android:id="@+id/tvTrangThaiHD" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--" android:textColor="@color/textPrimary" android:textSize="15sp" android:textStyle="bold"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Lich su hop dong -->
+    <TextView
+        android:id="@+id/tvLichSuTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LỊCH SỬ HỢP ĐỒNG"
+        android:textStyle="bold"
+        android:textColor="@color/textPrimary"
+        android:textSize="14sp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvLichSuHopDong"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+    <!-- Empty state -->
+    <LinearLayout
+        android:id="@+id/layoutEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingTop="48dp">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@android:drawable/ic_dialog_info"
+            android:tint="#81D4FA"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_contract"
+            android:textColor="@color/textSecondary"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+</LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

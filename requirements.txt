@@ -1,0 +1,24 @@
+# DEPENDENCIES - ỨNG DỤNG QUẢN LÝ NHÀ TRỌ (ANDROID)
+# Xem chi tiết trong app/build.gradle.kts
+
+# Android SDK
+compileSdk=36
+minSdk=24
+targetSdk=36
+
+# Thư viện chính (app/build.gradle.kts)
+androidx.core.ktx=1.12.0
+androidx.appcompat=1.6.1
+material=1.11.0
+androidx.constraintlayout=1.0.1
+androidx.lifecycle.viewmodel.ktx=2.7.0
+androidx.lifecycle.livedata.ktx=2.7.0
+
+# Database
+SQLite (built-in Android) - KHÔNG dùng Room
+
+# Build Tools
+Android Studio=Hedgehog 2023.1.1+
+JDK=11
+Gradle=8.x
+Kotlin=1.9.x

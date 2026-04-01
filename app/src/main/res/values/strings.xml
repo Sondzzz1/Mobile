@@ -1,0 +1,212 @@
+<resources>
+    <string name="app_name">Quản Lý Trọ</string>
+    <string name="title_home">Trang chủ</string>
+    <string name="title_invoice">Hóa đơn</string>
+    <string name="title_tenant">Khách thuê</string>
+    <string name="title_message">Nhắn tin</string>
+    <string name="title_issue">Sự cố</string>
+
+    <string name="reminder">Nhắc nhở</string>
+    <string name="reminder_desc">Gói cước CHUYÊN NGHIỆP sẽ hết hạn vào ngày 27/03/2026.</string>
+    <string name="renew">Gia hạn</string>
+
+    <string name="init_data">Khởi tạo dữ liệu</string>
+    <string name="no_service_fee">Bạn có nhà chưa tạo phí dịch vụ nào</string>
+    <string name="create_now">Tạo ngay</string>
+
+    <string name="management">Quản lý</string>
+    
+    <string name="nav_house">Quản lý nhà</string>
+    <string name="nav_room">Quản lý phòng</string>
+    <string name="nav_service">Quản lý dịch vụ</string>
+    <string name="nav_contract">Hợp đồng</string>
+    <string name="nav_utility">Điện nước</string>
+    <string name="nav_deposit">Cọc giữ chỗ</string>
+    <string name="nav_tenant">Khách thuê</string>
+    <string name="nav_invoice">Hóa đơn</string>
+    <string name="nav_revenue">Quản lý thu</string>
+    <string name="nav_expense">Quản lý chi</string>
+    <string name="nav_deposit_guest">Cọc khách</string>
+    <string name="nav_stats">Thống kê kinh doanh</string>
+    
+    <string name="nav_finance">Tài chính</string>
+    <string name="nav_report">Báo cáo</string>
+    <string name="nav_asset">Quản lý tài sản</string>
+    <string name="nav_permission">Phân quyền quản lý</string>
+    <string name="nav_settings">Cài đặt</string>
+    
+    <string name="create_house">Tạo nhà</string>
+    <string name="house_list">Danh sách nhà</string>
+    <string name="house_info">Thông tin nhà</string>
+    <string name="house_name">Tên nhà</string>
+    <string name="house_type">Loại nhà</string>
+    <string name="rent_model">Mô hình cho thuê</string>
+    <string name="model_room">Phòng trọ</string>
+    <string name="model_dorm">Ký túc xá</string>
+    <string name="address_info">Thông tin địa chỉ</string>
+    <string name="province">Tỉnh/Thành phố</string>
+    <string name="district">Quận/Huyện</string>
+    <string name="confirm">Xác nhận</string>
+    
+    <string name="all_houses">Tất cả nhà</string>
+    <string name="search_room">Tìm kiếm phòng</string>
+    <string name="add">Thêm</string>
+
+    <string name="room_info_title">Thông tin phòng</string>
+    <string name="tab_info">Thông tin</string>
+    <string name="tab_tenant">Khách thuê</string>
+    <string name="tab_contract">Hợp đồng</string>
+    <string name="floor_area">Tầng/Khu/Dãy</string>
+    <string name="room_price">Tiền phòng</string>
+    <string name="deposit_amount">Tiền cọc</string>
+    <string name="area">Diện tích</string>
+    <string name="max_people">Số người tối đa</string>
+    <string name="house_images">Hình ảnh nhà</string>
+    <string name="delete_room">Xóa phòng</string>
+
+    <string name="no_contract">Không có hợp đồng nào</string>
+    <string name="create_contract">Lập HĐ</string>
+
+    <string name="service">dịch vụ</string>
+    <string name="service_name">Tên dịch vụ</string>
+    <string name="service_type">Loại dịch vụ</string>
+    <string name="unit_price">Đơn giá</string>
+    <string name="currency_per_month">đ/Tháng</string>
+    <string name="select_house">Chọn nhà</string>
+    
+    <string name="service_type_1">Điện luỹ tiến theo đồng hồ</string>
+    <string name="service_type_2">Điện cố định theo đồng hồ</string>
+    <string name="service_type_3">Điện cố định theo người</string>
+    <string name="service_type_4">Điện biến động</string>
+    <string name="service_type_5">Nước luỹ tiến theo đồng hồ</string>
+    <string name="service_type_6">Nước cố định theo đồng hồ</string>
+    <string name="service_type_7">Nước cố định theo đầu người</string>
+    <string name="service_type_8">Nước biến động</string>
+    <string name="service_type_9">Gửi xe</string>
+    <string name="service_type_10">Vệ sinh</string>
+    <string name="service_type_11">Internet</string>
+    <string name="service_type_12">Phí quản lý</string>
+    <string name="service_type_13">Biến động khác</string>
+    <string name="service_type_14">Phí khác</string>
+    
+    <string name="create_service">Tạo dịch vụ</string>
+    <string name="date_in">Ngày vào</string>
+    <string name="date_out">Ngày hết hạn</string>
+    <string name="status">Trạng thái</string>
+
+    <!-- Create Contract form -->
+    <string name="create_contract_title">LẬP HĐ</string>
+    <string name="b1_title">THÔNG TIN HỢP ĐỒNG</string>
+    <string name="b1_desc">Vui lòng nhập đầy đủ các thông tin bắt buộc</string>
+    <string name="select_room">Chọn phòng</string>
+    <string name="start_date">Ngày bắt đầu tính tiền *</string>
+    <string name="end_date">Hạn hợp đồng *</string>
+    <string name="room_price_req">Tiền phòng *</string>
+    <string name="deposit_req">Tiền cọc *</string>
+    <string name="payment_cycle">Chu kỳ trả tiền phòng *</string>
+    <string name="closing_date">Ngày chốt tiền *</string>
+    <string name="closing_date_hint">Ghi chú: Nếu bạn thu tiền nhà từ ngày đầu tháng đến cuối tháng, hãy chọn ngày 31. Nếu bạn thu tiền từ ngày mùng 10 tháng này đến ngày mùng 9 tháng sau, hãy chọn ngày mùng 10</string>
+    <string name="paid_until">Đã thu tiền phòng đến ngày</string>
+    <string name="paid_until_hint">Ghi chú: Khách vào từ 1/1/2020 và bạn đã thu đến hết ngày 30/4/2020 thì hãy chọn là 30/4/2020</string>
+
+    <string name="b2_title">THÔNG TIN KHÁCH THUÊ</string>
+    <string name="b2_desc">Vui lòng nhập đầy đủ các thông tin bắt buộc</string>
+    <string name="phone_req">SĐT *</string>
+    <string name="fullname_req">Họ tên *</string>
+    <string name="workplace">Nơi làm việc</string>
+    <string name="email">Email</string>
+    <string name="dob">Ngày sinh</string>
+    <string name="id_card">CMND/CCCD</string>
+    <string name="issue_date">Ngày cấp</string>
+    <string name="issue_place">Nơi cấp</string>
+    <string name="ward">Xã/Phường</string>
+    <string name="detailed_address">Địa chỉ chi tiết</string>
+    <string name="note">Ghi chú</string>
+    <string name="collapse">Thu gọn</string>
+
+    <string name="b3_title">DỊCH VỤ SỬ DỤNG</string>
+    <string name="b3_desc">Chọn dịch vụ mà bạn sẽ tính tiền</string>
+    <string name="service_note">Ghi chú dịch vụ</string>
+    
+    <string name="b4_title">XÁC NHẬN ĐIỀU KHOẢN</string>
+    <string name="b4_desc">Chữ ký</string>
+    <string name="view_terms">Xem nội dung và điều khoản</string>
+
+    <!-- Utility List -->
+    <string name="utility_title">ĐIỆN NƯỚC</string>
+    <string name="btn_lock">CHỐT</string>
+    <string name="no_data">Không có dữ liệu</string>
+    <string name="header_room">Phòng</string>
+    <string name="header_electric">Số điện</string>
+    <string name="header_water">Số nước</string>
+
+    <!-- Create Utility -->
+    <string name="select_month">Chọn tháng *</string>
+    <string name="closing_date_req">Ngày chốt *</string>
+    <string name="select_room_req">Chọn phòng *</string>
+    <string name="select_contract_req">Chọn hợp đồng *</string>
+    <string name="lock_utility_note">Ghi chú: Bạn chỉ được chốt điện nước các phòng đang có người ở</string>
+    <string name="old_electric">Điện cũ</string>
+    <string name="new_electric">Điện mới</string>
+    <string name="old_water">Nước cũ</string>
+    <string name="new_water">Nước mới</string>
+    <string name="electric_image">Ảnh đồng hồ điện</string>
+    <string name="water_image">Ảnh đồng hồ nước</string>
+
+    <!-- Tenant List -->
+    <string name="search_tenant">Tìm kiếm khách thuê</string>
+    <string name="tenant_count">Khách thuê</string>
+
+    <!-- Create Tenant -->
+    <string name="create_tenant_title">THÊM KHÁCH THUÊ</string>
+    <string name="create_tenant_note">Chú ý: Tính năng này để thêm khách thuê (người phụ thuộc) vào phòng đang có hợp đồng. Với phòng trống, để thêm khách thuê bạn cần dùng tính năng Lập hợp đồng</string>
+    <string name="btn_confirm">XÁC NHẬN</string>
+
+    <!-- Invoice List & Create Invoice -->
+    <string name="invoice_title">HÓA ĐƠN</string>
+    <string name="unpaid">Chưa thanh toán</string>
+    <string name="room_cost">Tiền nhà</string>
+    <string name="service_cost">Tiền dịch vụ</string>
+    <string name="total_amount">Tổng tiền (%1$d Hóa đơn)</string>
+    <string name="create_invoice">Lập hóa đơn</string>
+    <string name="create_invoice_title">LẬP HÓA ĐƠN</string>
+    
+    <string name="invoice_b1_title">THÔNG TIN HÓA ĐƠN</string>
+    <string name="invoice_b1_desc">Vui lòng chọn đầy đủ các thông tin dưới đây</string>
+    
+    <string name="invoice_b2_title">DỊCH VỤ SỬ DỤNG</string>
+    <string name="invoice_b2_desc">Hãy chọn dịch vụ mà khách sử dụng</string>
+    
+    <string name="invoice_b3_title">TỔNG HỢP</string>
+    <string name="invoice_b3_desc">Kiểm tra kỹ lại thông tin trước khi lập</string>
+    
+    <string name="total_money">Tổng tiền</string>
+    <string name="discount_q">Giảm giá?</string>
+
+    <!-- Deposit List & Create Deposit -->
+    <string name="deposit_add_btn">THEM COC</string>
+    <string name="deposit_title">COC GIU CHO</string>
+    <string name="deposit_amount_req">Tien coc *</string>
+    <string name="room_amount_req">Tien phong *</string>
+    <string name="expected_move_in_req">Ngay vao du kien *</string>
+    <string name="attachments">Tai lieu dinh kem</string>
+
+    <!-- Income and Expense -->
+    <string name="income_title">QUẢN LÝ THU</string>
+    <string name="expense_title">QUẢN LÝ CHI</string>
+    <string name="income_add_btn">Thêm phiếu thu</string>
+    <string name="expense_add_btn">Thêm phiếu chi</string>
+    <string name="income_form_title">THU TIỀN</string>
+    <string name="expense_form_title">CHI PHÍ</string>
+    <string name="amount_req">Số tiền *</string>
+    <string name="income_type_req">Loại thu *</string>
+    <string name="expense_type_req">Loại chi *</string>
+    <string name="btn_add_inline">Thêm</string>
+    <string name="content_req">Noi dung *</string>
+    <string name="payer_req">Nguoi tra *</string>
+    <string name="payee_req">Nguoi nhan *</string>
+    <string name="payment_method_req">Hinh thuc thanh toan *</string>
+    <string name="transfer">Chuyển khoản</string>
+    <string name="cash">Tiền mặt</string>
+
+</resources>

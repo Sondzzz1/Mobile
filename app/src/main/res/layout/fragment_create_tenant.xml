@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        app:elevation="2dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:paddingHorizontal="16dp">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerVertical="true"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                app:tint="@color/textPrimary" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/create_tenant_title"
+                android:textAllCaps="true"
+                android:textColor="@color/textPrimary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="80dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/create_tenant_note"
+                android:textColor="@color/error"
+                android:textStyle="italic"
+                android:gravity="center"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Optional Avatar/Image (if needed, mockup shows profile image) -->
+            <RelativeLayout
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp">
+                
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#F5F5F5"/>
+                    
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:background="@drawable/border_selected"
+                    android:padding="6dp"
+                    android:src="@android:drawable/ic_menu_edit"
+                    app:tint="@color/colorSecondary" />
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Chọn nhà *"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <Spinner
+                android:id="@+id/spinnerHouse"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/select_room"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <Spinner
+                android:id="@+id/spinnerRoom"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/phone_req"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <EditText
+                android:id="@+id/etPhone"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:paddingHorizontal="12dp"
+                android:inputType="phone"
+                android:layout_marginBottom="16dp"
+                android:hint="SĐT"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/fullname_req"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <EditText
+                android:id="@+id/etFullName"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:paddingHorizontal="12dp"
+                android:inputType="textPersonName"
+                android:layout_marginBottom="16dp"
+                android:hint="Họ tên"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/workplace"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <EditText
+                android:id="@+id/etWorkplace"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:paddingHorizontal="12dp"
+                android:inputType="textCapWords"
+                android:layout_marginBottom="16dp"
+                android:hint="Nơi làm việc"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/email"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <EditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:paddingHorizontal="12dp"
+                android:inputType="textEmailAddress"
+                android:layout_marginBottom="16dp"
+                android:hint="Email"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/dob"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <EditText
+                android:id="@+id/etDob"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:paddingHorizontal="12dp"
+                android:inputType="text"
+                android:layout_marginBottom="16dp"
+                android:focusable="false"
+                android:clickable="true"
+                android:hint="Chọn ngày"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/id_card"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <EditText
+                android:id="@+id/etIdCard"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:paddingHorizontal="12dp"
+                android:inputType="number"
+                android:layout_marginBottom="16dp"
+                android:hint="CMND/CCCD"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/issue_date"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <EditText
+                android:id="@+id/etIssueDate"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:paddingHorizontal="12dp"
+                android:inputType="text"
+                android:layout_marginBottom="16dp"
+                android:hint="Ngày cấp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/issue_place"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <EditText
+                android:id="@+id/etIssuePlace"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:paddingHorizontal="12dp"
+                android:inputType="textCapWords"
+                android:layout_marginBottom="16dp"
+                android:hint="Nơi cấp"/>
+                
+            <!-- CCCD IMAGES OMITTED BY USER REQUEST -->
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/province"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <EditText
+                android:id="@+id/etProvince"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:paddingHorizontal="12dp"
+                android:inputType="textCapWords"
+                android:layout_marginBottom="16dp"
+                android:hint="Tỉnh/Thành phố"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Quận/Huyện"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <EditText
+                android:id="@+id/etDistrict"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:paddingHorizontal="12dp"
+                android:inputType="textCapWords"
+                android:layout_marginBottom="16dp"
+                android:hint="Quận/Huyện"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ward"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <EditText
+                android:id="@+id/etWard"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:paddingHorizontal="12dp"
+                android:inputType="textCapWords"
+                android:layout_marginBottom="16dp"
+                android:hint="Xã/Phường"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/detailed_address"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <EditText
+                android:id="@+id/etDetailedAddress"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:paddingHorizontal="12dp"
+                android:inputType="textCapSentences"
+                android:layout_marginBottom="16dp"
+                android:hint="Địa chỉ chi tiết"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/note"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+            <EditText
+                android:id="@+id/etNote"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:paddingHorizontal="12dp"
+                android:inputType="textCapSentences"
+                android:layout_marginBottom="24dp"
+                android:hint="Ghi chú"/>
+
+            <Button
+                android:id="@+id/btnSubmit"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="@string/btn_confirm"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/colorSecondary"
+                android:textStyle="bold"
+                app:cornerRadius="8dp"
+                android:layout_marginBottom="24dp"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
