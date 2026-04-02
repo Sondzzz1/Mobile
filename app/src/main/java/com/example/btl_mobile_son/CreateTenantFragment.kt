@@ -43,6 +43,12 @@ class CreateTenantFragment : Fragment() {
         }
         maKhach = arguments?.getLong("maKhach", -1L) ?: -1L
 
+        // Nếu đang chỉnh sửa khách thuê, ẩn spinners và chỉ cho sửa thông tin cá nhân
+        if (maKhach > 0) {
+            view.findViewById<Spinner>(R.id.spinnerHouse)?.visibility = View.GONE
+            view.findViewById<Spinner>(R.id.spinnerRoom)?.visibility = View.GONE
+        }
+
         val spinnerHouse = view.findViewById<Spinner>(R.id.spinnerHouse)
         val spinnerRoom = view.findViewById<Spinner>(R.id.spinnerRoom)
         val etPhone = view.findViewById<EditText>(R.id.etPhone)
@@ -87,25 +93,44 @@ class CreateTenantFragment : Fragment() {
 
         // Load danh sách nhà
         CoroutineScope(Dispatchers.IO).launch {
-            danhSachNha = dbManager.nhaTroDao.layTatCa()
+            try {
+                danhSachNha = dbManager.nhaTroDao.layTatCa()
+            } catch (e: Exception) {
+                android.util.Log.e("CreateTenantFragment", "Error loading houses", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Lỗi tải danh sách nhà trọ: ${e.message}", Toast.LENGTH_LONG).show()
+                    requireActivity().onBackPressed()
+                }
+                return@launch
+            }
+            
             withContext(Dispatchers.Main) {
                 if (danhSachNha.isEmpty()) {
                     Toast.makeText(context, "Chưa có nhà trọ nào. Vui lòng tạo nhà trọ trước!", Toast.LENGTH_LONG).show()
+                    requireActivity().onBackPressed()
                     return@withContext
                 }
 
-                spinnerHouse.adapter = ArrayAdapter(
-                    requireContext(),
-                    android.R.layout.simple_spinner_item,
-                    danhSachNha.map { it.tenNha }
-                ).apply {
-                    setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                try {
+                    spinnerHouse.adapter = ArrayAdapter(
+                        requireContext(),
+                        android.R.layout.simple_spinner_item,
+                        danhSachNha.map { it.tenNha }
+                    ).apply {
+                        setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("CreateTenantFragment", "Error setting house adapter", e)
+                    Toast.makeText(context, "Lỗi hiển thị danh sách nhà: ${e.message}", Toast.LENGTH_LONG).show()
+                    requireActivity().onBackPressed()
+                    return@withContext
                 }
 
                 spinnerHouse.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(parent: AdapterView<*>?, v: View?, pos: Int, id: Long) {
                         CoroutineScope(Dispatchers.IO).launch {
-                            val allPhong = dbManager.phongDao.layTheoNha(danhSachNha[pos].maNha)
+                            try {
+                                val allPhong = dbManager.phongDao.layTheoNha(danhSachNha[pos].maNha)
                             
                             // Lấy số người đang ở trong mỗi phòng via HopDongThanhVien
                             val phongVoiSoNguoi = allPhong.map { phong ->
@@ -128,33 +153,44 @@ class CreateTenantFragment : Fragment() {
                             }
                             
                             withContext(Dispatchers.Main) {
-                                if (danhSachPhong.isEmpty()) {
-                                    spinnerRoom.adapter = ArrayAdapter(
-                                        requireContext(),
-                                        android.R.layout.simple_spinner_item,
-                                        listOf("Không có phòng trống")
-                                    )
-                                } else {
-                                    // Hiển thị phòng với thông tin số người
-                                    val roomLabels = danhSachPhong.map { phong ->
-                                        val soNguoiDangO = phongVoiSoNguoi
-                                            .find { it.first.maPhong == phong.maPhong }?.second ?: 0
-                                        val status = when {
-                                            phong.trangThai == "dat_coc" -> " (Đã đặt cọc)"
-                                            phong.trangThai == "da_thue" && soNguoiDangO >= phong.soNguoiToiDa -> " (Đã đủ ${phong.soNguoiToiDa} người)"
-                                            phong.trangThai == "da_thue" -> " (${soNguoiDangO}/${phong.soNguoiToiDa} người)"
-                                            else -> " (Trống)"
+                                try {
+                                    if (danhSachPhong.isEmpty()) {
+                                        spinnerRoom.adapter = ArrayAdapter(
+                                            requireContext(),
+                                            android.R.layout.simple_spinner_item,
+                                            listOf("Không có phòng trống")
+                                        )
+                                    } else {
+                                        // Hiển thị phòng với thông tin số người
+                                        val roomLabels = danhSachPhong.map { phong ->
+                                            val soNguoiDangO = phongVoiSoNguoi
+                                                .find { it.first.maPhong == phong.maPhong }?.second ?: 0
+                                            val status = when {
+                                                phong.trangThai == "dat_coc" -> " (Đã đặt cọc)"
+                                                phong.trangThai == "da_thue" && soNguoiDangO >= phong.soNguoiToiDa -> " (Đã đủ ${phong.soNguoiToiDa} người)"
+                                                phong.trangThai == "da_thue" -> " (${soNguoiDangO}/${phong.soNguoiToiDa} người)"
+                                                else -> " (Trống)"
+                                            }
+                                            "${phong.tenPhong} - ${phong.giaCoBan.toLong()}đ$status"
                                         }
-                                        "${phong.tenPhong} - ${phong.giaCoBan.toLong()}đ$status"
+                                        
+                                        spinnerRoom.adapter = ArrayAdapter(
+                                            requireContext(),
+                                            android.R.layout.simple_spinner_item,
+                                            roomLabels
+                                        ).apply {
+                                            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                                        }
                                     }
-                                    
-                                    spinnerRoom.adapter = ArrayAdapter(
-                                        requireContext(),
-                                        android.R.layout.simple_spinner_item,
-                                        roomLabels
-                                    ).apply {
-                                        setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                                    }
+                                } catch (e: Exception) {
+                                    android.util.Log.e("CreateTenantFragment", "Error setting room adapter", e)
+                                    Toast.makeText(context, "Lỗi hiển thị danh sách phòng: ${e.message}", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                            } catch (e: Exception) {
+                                android.util.Log.e("CreateTenantFragment", "Error loading rooms", e)
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(context, "Lỗi tải danh sách phòng: ${e.message}", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }

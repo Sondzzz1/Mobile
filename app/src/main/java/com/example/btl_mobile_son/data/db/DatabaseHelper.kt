@@ -8,7 +8,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "quan_ly_nha_tro.db"
-        private const val DATABASE_VERSION = 7  // Tăng version để trigger onUpgrade
+        private const val DATABASE_VERSION = 8  // Tăng lên 8 để trigger migration
 
         // Tên bảng
         const val TABLE_NHA_TRO = "nha_tro"
@@ -58,7 +58,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             )
         """)
 
-        // Bảng Khách thuê
+        // Bảng Khách thuê (đã bỏ ma_phong và trang_thai - dùng HopDongThanhVien thay thế)
         db.execSQL("""
             CREATE TABLE $TABLE_KHACH_THUE (
                 ma_khach INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -74,11 +74,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 quan_huyen TEXT,
                 xa_phuong TEXT,
                 dia_chi_chi_tiet TEXT,
-                ma_phong INTEGER,
-                trang_thai TEXT DEFAULT 'dang_o',
                 ghi_chu TEXT,
-                ngay_tao INTEGER DEFAULT 0,
-                FOREIGN KEY (ma_phong) REFERENCES $TABLE_PHONG(ma_phong) ON DELETE SET NULL
+                ngay_tao INTEGER DEFAULT 0
             )
         """)
 
@@ -238,24 +235,25 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         // Nếu upgrade từ version cũ, đơn giản là drop tất cả và tạo lại
         // Điều này đảm bảo không có lỗi migration phức tạp
-        if (oldVersion < 7) {
-            // Drop tất cả các bảng theo thứ tự ngược lại (để tránh foreign key constraint)
-            db.execSQL("DROP TABLE IF EXISTS $TABLE_GIAO_DICH")
-            db.execSQL("DROP TABLE IF EXISTS $TABLE_CHI_TIET_HOA_DON")
-            db.execSQL("DROP TABLE IF EXISTS $TABLE_HOA_DON")
-            db.execSQL("DROP TABLE IF EXISTS $TABLE_CHI_SO_DIEN_NUOC")
-            db.execSQL("DROP TABLE IF EXISTS $TABLE_DAT_COC")
-            db.execSQL("DROP TABLE IF EXISTS $TABLE_PHONG_DICH_VU")
-            db.execSQL("DROP TABLE IF EXISTS $TABLE_DICH_VU")
-            db.execSQL("DROP TABLE IF EXISTS $TABLE_HOP_DONG_THANH_VIEN")
-            db.execSQL("DROP TABLE IF EXISTS $TABLE_HOP_DONG")
-            db.execSQL("DROP TABLE IF EXISTS $TABLE_KHACH_THUE")
-            db.execSQL("DROP TABLE IF EXISTS $TABLE_PHONG")
-            db.execSQL("DROP TABLE IF EXISTS $TABLE_NHA_TRO")
-            
-            // Tạo lại tất cả
-            onCreate(db)
-        }
+        android.util.Log.d("DatabaseHelper", "Upgrading database from $oldVersion to $newVersion")
+        
+        // Drop tất cả các bảng theo thứ tự ngược lại (để tránh foreign key constraint)
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_GIAO_DICH")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_CHI_TIET_HOA_DON")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_HOA_DON")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_CHI_SO_DIEN_NUOC")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_DAT_COC")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_PHONG_DICH_VU")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_DICH_VU")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_HOP_DONG_THANH_VIEN")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_HOP_DONG")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_KHACH_THUE")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_PHONG")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_NHA_TRO")
+        
+        // Tạo lại tất cả
+        onCreate(db)
+        android.util.Log.d("DatabaseHelper", "Database upgrade completed")
     }
     
     override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
