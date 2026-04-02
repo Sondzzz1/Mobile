@@ -142,6 +142,16 @@ class SampleDataHelper(private val context: Context) {
                 tienDatCoc = 5000000L,
                 trangThai = "dang_thue"
             ))
+            
+            // Thêm vào HopDongThanhVien
+            dbManager.hopDongThanhVienDao.them(HopDongThanhVien(
+                maHopDong = hopDong1,
+                maKhach = khach1,
+                vaiTro = "dai_dien",
+                ngayVaoO = ngayBatDau1,
+                trangThai = "dang_o",
+                ghiChu = "Người đại diện hợp đồng"
+            ))
 
             cal.timeInMillis = System.currentTimeMillis()
             cal.add(Calendar.MONTH, -1)
@@ -158,6 +168,16 @@ class SampleDataHelper(private val context: Context) {
                 tienDatCoc = 6000000L,
                 trangThai = "dang_thue"
             ))
+            
+            // Thêm vào HopDongThanhVien
+            dbManager.hopDongThanhVienDao.them(HopDongThanhVien(
+                maHopDong = hopDong2,
+                maKhach = khach2,
+                vaiTro = "dai_dien",
+                ngayVaoO = ngayBatDau2,
+                trangThai = "dang_o",
+                ghiChu = "Người đại diện hợp đồng"
+            ))
 
             cal.timeInMillis = System.currentTimeMillis()
             cal.add(Calendar.DAY_OF_MONTH, -15)
@@ -165,7 +185,7 @@ class SampleDataHelper(private val context: Context) {
             cal.add(Calendar.YEAR, 1)
             val ngayKetThuc3 = cal.timeInMillis
 
-            dbManager.hopDongDao.them(HopDong(
+            val hopDong3 = dbManager.hopDongDao.them(HopDong(
                 maPhong = phong201,
                 maKhach = khach3,
                 ngayBatDau = ngayBatDau3,
@@ -173,6 +193,16 @@ class SampleDataHelper(private val context: Context) {
                 giaThueThang = 2800000L,
                 tienDatCoc = 5600000L,
                 trangThai = "dang_thue"
+            ))
+            
+            // Thêm vào HopDongThanhVien
+            dbManager.hopDongThanhVienDao.them(HopDongThanhVien(
+                maHopDong = hopDong3,
+                maKhach = khach3,
+                vaiTro = "dai_dien",
+                ngayVaoO = ngayBatDau3,
+                trangThai = "dang_o",
+                ghiChu = "Người đại diện hợp đồng"
             ))
 
             // 5. Tạo dịch vụ mẫu
@@ -320,8 +350,15 @@ class SampleDataHelper(private val context: Context) {
                 tienDatCoc = 2000000L,
                 giaPhong = 2200000L,
                 ngayDuKienVao = cal.timeInMillis,
+                trangThai = "hieu_luc",
                 ghiChu = "Khách đặt cọc giữ phòng"
             ))
+            
+            // Cập nhật trạng thái phòng 102 thành "dat_coc"
+            val phong102Data = dbManager.phongDao.layTheoMa(phong102)
+            phong102Data?.let {
+                dbManager.phongDao.capNhat(it.copy(trangThai = "dat_coc"))
+            }
 
             // Đánh dấu đã load sample data
             prefs.edit().putBoolean(KEY_SAMPLE_DATA_LOADED, true).apply()
