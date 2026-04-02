@@ -209,6 +209,7 @@ class CreateUtilityFragment : Fragment() {
                 nam = nam,
                 chiSoCu = chiSoCu,
                 chiSoMoi = chiSoMoi,
+                soTieuThu = chiSoMoi - chiSoCu,  // TÍNH SỐ TIÊU THỤ
                 donGia = donGia,
                 ghiChu = etGhiChu.text.toString().trim()
             )

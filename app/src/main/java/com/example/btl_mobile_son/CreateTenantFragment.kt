@@ -509,8 +509,6 @@ class CreateTenantFragment : Fragment() {
         
         // Tạo dialog
         val dialog = android.app.AlertDialog.Builder(requireContext())
-            .setTitle("Tạo hợp đồng thuê phòng")
-            .setMessage("⚠️ Phòng trống phải có hợp đồng mới cho thuê")
             .setView(dialogView)
             .setPositiveButton("Tạo hợp đồng", null)
             .setNegativeButton("Hủy", null)

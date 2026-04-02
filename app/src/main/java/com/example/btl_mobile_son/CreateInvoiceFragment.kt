@@ -23,6 +23,8 @@ import java.util.Locale
 class CreateInvoiceFragment : Fragment() {
 
     private lateinit var dbManager: DatabaseManager
+    private var danhSachNha = listOf<NhaTro>()
+    private var danhSachPhong = listOf<Phong>()
     private var danhSachHopDong = listOf<HopDong>()
     private var thangChon: Int = Calendar.getInstance().get(Calendar.MONTH) + 1
     private var namChon: Int = Calendar.getInstance().get(Calendar.YEAR)
@@ -53,6 +55,8 @@ class CreateInvoiceFragment : Fragment() {
             return
         }
 
+        val spinnerHouse = view.findViewById<Spinner>(R.id.spinnerHouse)
+        val spinnerRoom = view.findViewById<Spinner>(R.id.spinnerRoom)
         val spinnerContract = view.findViewById<Spinner>(R.id.spinnerContract)
         val etMonth = view.findViewById<EditText>(R.id.etMonth)
         val btnPreview = view.findViewById<Button>(R.id.btnPreview)
@@ -90,7 +94,91 @@ class CreateInvoiceFragment : Fragment() {
             ).show()
         }
 
+        // Load danh sách nhà
+        CoroutineScope(Dispatchers.IO).launch {
+            danhSachNha = dbManager.nhaTroDao.layTatCa()
+            
+            withContext(Dispatchers.Main) {
+                if (danhSachNha.isEmpty()) {
+                    Toast.makeText(context, "Chưa có nhà trọ nào!", Toast.LENGTH_SHORT).show()
+                    return@withContext
+                }
+
+                spinnerHouse.adapter = ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_spinner_item,
+                    danhSachNha.map { it.tenNha }
+                ).apply {
+                    setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                }
+
+                // Listener chọn nhà → load phòng
+                spinnerHouse.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, v: View?, pos: Int, id: Long) {
+                        val nha = danhSachNha[pos]
+                        
+                        CoroutineScope(Dispatchers.IO).launch {
+                            danhSachPhong = dbManager.phongDao.layTheoNha(nha.maNha)
+                            
+                            withContext(Dispatchers.Main) {
+                                if (danhSachPhong.isEmpty()) {
+                                    spinnerRoom.adapter = ArrayAdapter(
+                                        requireContext(),
+                                        android.R.layout.simple_spinner_item,
+                                        listOf("Không có phòng")
+                                    )
+                                } else {
+                                    spinnerRoom.adapter = ArrayAdapter(
+                                        requireContext(),
+                                        android.R.layout.simple_spinner_item,
+                                        danhSachPhong.map { it.tenPhong }
+                                    ).apply {
+                                        setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                }
+            }
+        }
+
+        // Listener chọn phòng → load hợp đồng
+        spinnerRoom.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, v: View?, pos: Int, id: Long) {
+                if (danhSachPhong.isEmpty()) return
+                
+                val phong = danhSachPhong[pos]
+                
+                CoroutineScope(Dispatchers.IO).launch {
+                    danhSachHopDong = dbManager.hopDongDao.layTatCa()
+                        .filter { it.maPhong == phong.maPhong && it.trangThai == "dang_thue" }
+                    
+                    withContext(Dispatchers.Main) {
+                        if (danhSachHopDong.isEmpty()) {
+                            spinnerContract.adapter = ArrayAdapter(
+                                requireContext(),
+                                android.R.layout.simple_spinner_item,
+                                listOf("Phòng chưa có hợp đồng đang thuê")
+                            )
+                        } else {
+                            spinnerContract.adapter = ArrayAdapter(
+                                requireContext(),
+                                android.R.layout.simple_spinner_item,
+                                danhSachHopDong.map { "HĐ #${it.maHopDong} - ${formatMoney(it.giaThueThang)}/tháng" }
+                            ).apply {
+                                setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                            }
+                        }
+                    }
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
         // Load danh sách hợp đồng đang thuê (VĐ7: Chỉ chọn hợp đồng)
+        /*
         CoroutineScope(Dispatchers.IO).launch {
             danhSachHopDong = dbManager.hopDongDao.layTatCa()
                 .filter { it.trangThai == "dang_thue" }
@@ -133,6 +221,7 @@ class CreateInvoiceFragment : Fragment() {
                 }
             }
         }
+        */
 
         view.findViewById<ImageView>(R.id.btnBack).setOnClickListener {
             requireActivity().onBackPressed()
