@@ -27,6 +27,11 @@ class UtilityListFragment : Fragment() {
     private var thangHienTai = Calendar.getInstance().get(Calendar.MONTH) + 1
     private var namHienTai = Calendar.getInstance().get(Calendar.YEAR)
     private var xemTatCa = false
+    
+    private var danhSachNha = listOf<com.example.btl_mobile_son.data.model.NhaTro>()
+    private var danhSachPhong = listOf<com.example.btl_mobile_son.data.model.Phong>()
+    private var maNhaChon: Long = -1L
+    private var maPhongChon: Long = -1L
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_utility_list, container, false)
@@ -45,7 +50,9 @@ class UtilityListFragment : Fragment() {
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerUtility)
         val tvEmpty = view.findViewById<TextView>(R.id.tvEmpty)
         
-        // CẢI TIẾN 3: Bộ lọc tháng/năm
+        // Bộ lọc nhà/phòng/tháng/năm
+        val spinnerHouse = view.findViewById<Spinner>(R.id.spinnerHouse)
+        val spinnerRoom = view.findViewById<Spinner>(R.id.spinnerRoom)
         val spinnerThang = view.findViewById<Spinner>(R.id.spinnerThang)
         val spinnerNam = view.findViewById<Spinner>(R.id.spinnerNam)
         val btnXemTatCa = view.findViewById<Button>(R.id.btnXemTatCa)
@@ -59,6 +66,95 @@ class UtilityListFragment : Fragment() {
         val namList = (2020..2030).toList()
         spinnerNam?.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, namList)
         spinnerNam?.setSelection(namList.indexOf(namHienTai))
+        
+        // Load danh sách nhà
+        CoroutineScope(Dispatchers.IO).launch {
+            danhSachNha = dbManager.nhaTroDao.layTatCa()
+            
+            withContext(Dispatchers.Main) {
+                if (danhSachNha.isEmpty()) {
+                    Toast.makeText(context, "Chưa có nhà trọ nào!", Toast.LENGTH_SHORT).show()
+                    return@withContext
+                }
+                
+                // Tạo danh sách với "Tất cả nhà" ở đầu
+                val tenNhaList = mutableListOf("Tất cả nhà")
+                tenNhaList.addAll(danhSachNha.map { it.tenNha })
+                
+                spinnerHouse.adapter = ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_spinner_item,
+                    tenNhaList
+                ).apply {
+                    setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                }
+                
+                // Listener chọn nhà → load phòng
+                spinnerHouse.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, v: View?, position: Int, id: Long) {
+                        if (position == 0) {
+                            // Tất cả nhà
+                            maNhaChon = -1L
+                            maPhongChon = -1L
+                            
+                            // Load tất cả phòng
+                            CoroutineScope(Dispatchers.IO).launch {
+                                danhSachPhong = dbManager.phongDao.layTatCa()
+                                withContext(Dispatchers.Main) {
+                                    val tenPhongList = mutableListOf("Tất cả phòng")
+                                    tenPhongList.addAll(danhSachPhong.map { "${it.tenPhong} - ${danhSachNha.find { n -> n.maNha == it.maNha }?.tenNha ?: ""}" })
+                                    
+                                    spinnerRoom.adapter = ArrayAdapter(
+                                        requireContext(),
+                                        android.R.layout.simple_spinner_item,
+                                        tenPhongList
+                                    ).apply {
+                                        setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                                    }
+                                    taiDuLieu(recyclerView, tvEmpty)
+                                }
+                            }
+                        } else {
+                            // Nhà cụ thể
+                            maNhaChon = danhSachNha[position - 1].maNha
+                            maPhongChon = -1L
+                            
+                            // Load phòng của nhà này
+                            CoroutineScope(Dispatchers.IO).launch {
+                                danhSachPhong = dbManager.phongDao.layTheoNha(maNhaChon)
+                                withContext(Dispatchers.Main) {
+                                    val tenPhongList = mutableListOf("Tất cả phòng")
+                                    tenPhongList.addAll(danhSachPhong.map { it.tenPhong })
+                                    
+                                    spinnerRoom.adapter = ArrayAdapter(
+                                        requireContext(),
+                                        android.R.layout.simple_spinner_item,
+                                        tenPhongList
+                                    ).apply {
+                                        setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                                    }
+                                    taiDuLieu(recyclerView, tvEmpty)
+                                }
+                            }
+                        }
+                    }
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                }
+                
+                // Listener chọn phòng
+                spinnerRoom.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, v: View?, position: Int, id: Long) {
+                        if (position == 0) {
+                            maPhongChon = -1L
+                        } else {
+                            maPhongChon = danhSachPhong[position - 1].maPhong
+                        }
+                        taiDuLieu(recyclerView, tvEmpty)
+                    }
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                }
+            }
+        }
 
         adapter = ChiSoAdapter(danhSach,
             onEdit = { chiSo ->
@@ -99,7 +195,7 @@ class UtilityListFragment : Fragment() {
                 .addToBackStack(null).commit()
         }
         
-        // Listener cho bộ lọc
+        // Listener cho bộ lọc tháng/năm
         spinnerThang?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, v: View?, pos: Int, id: Long) {
                 if (!xemTatCa) {
@@ -125,10 +221,10 @@ class UtilityListFragment : Fragment() {
             btnXemTatCa.text = if (xemTatCa) "Lọc" else "Tất cả"
             spinnerThang?.isEnabled = !xemTatCa
             spinnerNam?.isEnabled = !xemTatCa
+            spinnerHouse?.isEnabled = !xemTatCa
+            spinnerRoom?.isEnabled = !xemTatCa
             taiDuLieu(recyclerView, tvEmpty)
         }
-
-        taiDuLieu(recyclerView, tvEmpty)
     }
 
     override fun onResume() {
@@ -142,7 +238,7 @@ class UtilityListFragment : Fragment() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 // Lấy dữ liệu theo bộ lọc
-                val ds = if (xemTatCa) {
+                var ds = if (xemTatCa) {
                     // Lấy tất cả chỉ số, sắp xếp theo năm, tháng giảm dần
                     val allChiSo = mutableListOf<ChiSoDienNuoc>()
                     for (y in 2030 downTo 2020) {
@@ -155,7 +251,19 @@ class UtilityListFragment : Fragment() {
                     dbManager.chiSoDienNuocDao.layTheoThangNam(thangHienTai, namHienTai)
                 }
                 
-                // CẢI TIẾN 2: Map sang ChiSoDisplay với tên phòng đầy đủ
+                // Lọc theo nhà và phòng
+                if (maNhaChon > 0) {
+                    ds = ds.filter { chiSo ->
+                        val phong = dbManager.phongDao.layTheoMa(chiSo.maPhong)
+                        phong?.maNha == maNhaChon
+                    }
+                }
+                
+                if (maPhongChon > 0) {
+                    ds = ds.filter { it.maPhong == maPhongChon }
+                }
+                
+                // Map sang ChiSoDisplay với tên phòng đầy đủ
                 val dsHienThi = ds.map { chiSo ->
                     val phong = dbManager.phongDao.layTheoMa(chiSo.maPhong)
                     val nha = phong?.let { dbManager.nhaTroDao.layTheoMa(it.maNha) }

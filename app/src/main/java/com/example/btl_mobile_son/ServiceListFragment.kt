@@ -4,8 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -25,6 +28,8 @@ class ServiceListFragment : Fragment() {
     private lateinit var dbManager: DatabaseManager
     private lateinit var adapter: DichVuAdapter
     private val danhSach = mutableListOf<DichVu>()
+    private var danhSachNha = listOf<com.example.btl_mobile_son.data.model.NhaTro>()
+    private var maNhaChon: Long = -1L
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_service_list, container, false)
@@ -42,6 +47,46 @@ class ServiceListFragment : Fragment() {
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerService)
         val tvEmpty = view.findViewById<TextView>(R.id.tvEmpty)
+        val spinnerHouse = view.findViewById<Spinner>(R.id.spinnerHouse)
+
+        // Load danh sách nhà và setup spinner
+        CoroutineScope(Dispatchers.IO).launch {
+            danhSachNha = dbManager.nhaTroDao.layTatCa()
+            
+            withContext(Dispatchers.Main) {
+                if (danhSachNha.isEmpty()) {
+                    Toast.makeText(context, "Chưa có nhà trọ nào!", Toast.LENGTH_SHORT).show()
+                    return@withContext
+                }
+                
+                // Tạo danh sách với "Tất cả nhà" ở đầu
+                val tenNhaList = mutableListOf("Tất cả nhà")
+                tenNhaList.addAll(danhSachNha.map { it.tenNha })
+                
+                spinnerHouse.adapter = ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_spinner_item,
+                    tenNhaList
+                ).apply {
+                    setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                }
+                
+                // Listener khi chọn nhà
+                spinnerHouse.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, v: View?, position: Int, id: Long) {
+                        if (position == 0) {
+                            // Chọn "Tất cả nhà"
+                            maNhaChon = -1L
+                        } else {
+                            // Chọn nhà cụ thể
+                            maNhaChon = danhSachNha[position - 1].maNha
+                        }
+                        taiDuLieu(recyclerView, tvEmpty)
+                    }
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                }
+            }
+        }
 
         adapter = DichVuAdapter(danhSach,
             onEdit = { dichVu ->
@@ -77,12 +122,18 @@ class ServiceListFragment : Fragment() {
         }
 
         view.findViewById<Button>(R.id.btnAddService).setOnClickListener {
+            // Truyền maNha nếu đang chọn nhà cụ thể
+            val fragment = CreateServiceFragment().apply {
+                if (maNhaChon > 0) {
+                    arguments = Bundle().apply { putLong("maNha", maNhaChon) }
+                }
+            }
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, CreateServiceFragment())
+                .replace(R.id.fragment_container, fragment)
                 .addToBackStack(null).commit()
         }
 
-        taiDuLieu(recyclerView, tvEmpty)
+        // Không gọi taiDuLieu ở đây vì spinner listener sẽ tự động gọi
     }
 
     override fun onResume() {
@@ -95,13 +146,28 @@ class ServiceListFragment : Fragment() {
     private fun taiDuLieu(recyclerView: RecyclerView, tvEmpty: TextView) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val ds = dbManager.dichVuDao.layTatCa()
+                // Lọc theo nhà nếu có chọn
+                val ds = if (maNhaChon > 0) {
+                    dbManager.dichVuDao.layTatCa().filter { it.maNha == maNhaChon }
+                } else {
+                    dbManager.dichVuDao.layTatCa()
+                }
+                
+                // Lấy tên nhà để hiển thị
+                val tenNha = if (maNhaChon > 0) {
+                    dbManager.nhaTroDao.layTheoMa(maNhaChon)?.tenNha ?: "Nhà trọ"
+                } else {
+                    "Tất cả nhà"
+                }
+                
                 withContext(Dispatchers.Main) {
                     danhSach.clear()
                     danhSach.addAll(ds)
                     adapter.notifyDataSetChanged()
                     tvEmpty.visibility = if (ds.isEmpty()) View.VISIBLE else View.GONE
                     recyclerView.visibility = if (ds.isEmpty()) View.GONE else View.VISIBLE
+                    
+                    view?.findViewById<TextView>(R.id.tvServiceCount)?.text = "$tenNha - ${ds.size} dịch vụ"
                 }
             } catch (e: Exception) {
                 android.util.Log.e("ServiceListFragment", "Error loading data", e)

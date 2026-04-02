@@ -78,43 +78,74 @@
                 android:text="03/2026" />
         </com.google.android.material.tabs.TabLayout>
         
-        <!-- CẢI TIẾN 3: Bộ lọc tháng/năm -->
+        <!-- CẢI TIẾN 3: Bộ lọc nhà/phòng/tháng/năm -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:padding="12dp"
-            android:background="#26A69A"
-            android:gravity="center_vertical">
+            android:background="#26A69A">
             
-            <Spinner
-                android:id="@+id/spinnerThang"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="40dp"
-                android:background="@drawable/edit_text_bg"
-                android:layout_marginEnd="8dp"
-                android:paddingHorizontal="8dp"/>
+            <!-- Hàng 1: Nhà và Phòng -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+                
+                <Spinner
+                    android:id="@+id/spinnerHouse"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="40dp"
+                    android:background="@drawable/edit_text_bg"
+                    android:layout_marginEnd="8dp"
+                    android:paddingHorizontal="8dp"/>
+                
+                <Spinner
+                    android:id="@+id/spinnerRoom"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="40dp"
+                    android:background="@drawable/edit_text_bg"
+                    android:paddingHorizontal="8dp"/>
+            </LinearLayout>
             
-            <Spinner
-                android:id="@+id/spinnerNam"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="40dp"
-                android:background="@drawable/edit_text_bg"
-                android:layout_marginStart="8dp"
-                android:paddingHorizontal="8dp"/>
-            
-            <Button
-                android:id="@+id/btnXemTatCa"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:text="Tất cả"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/colorSecondary"
-                android:layout_marginStart="8dp"
-                android:textSize="12sp"
-                app:cornerRadius="4dp"/>
+            <!-- Hàng 2: Tháng và Năm -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                
+                <Spinner
+                    android:id="@+id/spinnerThang"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="40dp"
+                    android:background="@drawable/edit_text_bg"
+                    android:layout_marginEnd="8dp"
+                    android:paddingHorizontal="8dp"/>
+                
+                <Spinner
+                    android:id="@+id/spinnerNam"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="40dp"
+                    android:background="@drawable/edit_text_bg"
+                    android:layout_marginEnd="8dp"
+                    android:paddingHorizontal="8dp"/>
+                
+                <Button
+                    android:id="@+id/btnXemTatCa"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="Tất cả"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/colorSecondary"
+                    android:textSize="12sp"
+                    android:paddingHorizontal="12dp"
+                    app:cornerRadius="4dp"/>
+            </LinearLayout>
         </LinearLayout>
 
         <View

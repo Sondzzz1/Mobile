@@ -78,17 +78,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.nav_home -> loadFragment(DashboardFragment())
-            // Removed R.id.nav_house
-            // Removed R.id.nav_room
+            R.id.nav_home -> loadFragment(HouseListFragment())  // Mở danh sách nhà trọ
             R.id.nav_tenant -> loadFragment(TenantListFragment())
             R.id.nav_contract -> loadFragment(ContractListFragment())
-            // Removed R.id.nav_invoice
             R.id.nav_service -> loadFragment(ServiceListFragment())
             R.id.nav_utility -> loadFragment(UtilityListFragment())
-            // Removed R.id.nav_deposit
-            // Removed R.id.nav_income
-            // Removed R.id.nav_expense
         }
         drawerLayout.closeDrawer(GravityCompat.START)
         return true

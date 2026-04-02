@@ -5,8 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -25,6 +28,7 @@ class RoomListFragment : Fragment() {
     private lateinit var dbManager: DatabaseManager
     private lateinit var adapter: PhongAdapter
     private var maNha: Long = -1L
+    private var danhSachNha = listOf<com.example.btl_mobile_son.data.model.NhaTro>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_room_list, container, false)
@@ -43,6 +47,8 @@ class RoomListFragment : Fragment() {
         maNha = arguments?.getLong("maNha", -1L) ?: -1L
 
         val rvRoomList = view.findViewById<RecyclerView>(R.id.rvRoomList)
+        val spinnerHouse = view.findViewById<Spinner>(R.id.spinnerHouse)
+        
         adapter = PhongAdapter(
             danhSach = emptyList(),
             onItemClick = { phong ->
@@ -83,6 +89,55 @@ class RoomListFragment : Fragment() {
             requireActivity().onBackPressed()
         }
 
+        // Load danh sách nhà và setup spinner
+        CoroutineScope(Dispatchers.IO).launch {
+            danhSachNha = dbManager.nhaTroDao.layTatCa()
+            
+            withContext(Dispatchers.Main) {
+                if (danhSachNha.isEmpty()) {
+                    Toast.makeText(context, "Chưa có nhà trọ nào!", Toast.LENGTH_SHORT).show()
+                    return@withContext
+                }
+                
+                // Tạo danh sách hiển thị với "Tất cả nhà" ở đầu
+                val tenNhaList = mutableListOf("Tất cả nhà")
+                tenNhaList.addAll(danhSachNha.map { it.tenNha })
+                
+                spinnerHouse.adapter = ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_spinner_item,
+                    tenNhaList
+                ).apply {
+                    setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                }
+                
+                // Set vị trí ban đầu dựa vào maNha từ arguments
+                if (maNha > 0) {
+                    val index = danhSachNha.indexOfFirst { it.maNha == maNha }
+                    if (index >= 0) {
+                        spinnerHouse.setSelection(index + 1) // +1 vì có "Tất cả nhà" ở đầu
+                    }
+                } else {
+                    spinnerHouse.setSelection(0) // Mặc định "Tất cả nhà"
+                }
+                
+                // Listener khi chọn nhà
+                spinnerHouse.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, v: View?, position: Int, id: Long) {
+                        if (position == 0) {
+                            // Chọn "Tất cả nhà"
+                            maNha = -1L
+                        } else {
+                            // Chọn nhà cụ thể
+                            maNha = danhSachNha[position - 1].maNha
+                        }
+                        taiDuLieu(view)
+                    }
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                }
+            }
+        }
+
         view.findViewById<Button>(R.id.btnAddRoom).setOnClickListener {
             if (maNha <= 0) {
                 // Nếu không có maNha, chuyển đến danh sách nhà để chọn
@@ -100,7 +155,7 @@ class RoomListFragment : Fragment() {
             }
         }
 
-        taiDuLieu(view)
+        // Không gọi taiDuLieu ở đây vì spinner listener sẽ tự động gọi
     }
 
     override fun onResume() {
