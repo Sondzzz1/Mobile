@@ -10,11 +10,11 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:contentDescription="Logo"
         android:paddingTop="8dp"
-        android:src="@mipmap/ic_launcher_round" />
+        android:src="@drawable/ic_app_logo" />
         
     <!-- Using a placeholder for avatar -->
 
