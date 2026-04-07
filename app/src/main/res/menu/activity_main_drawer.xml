@@ -11,6 +11,10 @@
             android:icon="@android:drawable/ic_menu_info_details"
             android:title="@string/nav_service" />
         <item
+            android:id="@+id/nav_room_service"
+            android:icon="@android:drawable/ic_menu_set_as"
+            android:title="Dịch vụ phòng" />
+        <item
             android:id="@+id/nav_utility"
             android:icon="@android:drawable/ic_menu_preferences"
             android:title="@string/nav_utility" />
@@ -40,16 +44,16 @@
             android:title="@string/nav_stats" />
         <item
             android:id="@+id/nav_issue"
-            android:icon="@android:drawable/ic_menu_close_clear_cancel"
-            android:title="@string/title_issue" />
+            android:icon="@android:drawable/ic_dialog_alert"
+            android:title="Quản lý sự cố" />
         <item
             android:id="@+id/nav_asset"
             android:icon="@android:drawable/ic_menu_manage"
             android:title="@string/nav_asset" />
         <item
             android:id="@+id/nav_permission"
-            android:icon="@android:drawable/ic_menu_recent_history"
-            android:title="@string/nav_permission" />
+            android:icon="@android:drawable/ic_lock_power_off"
+            android:title="Đăng xuất" />
         <item
             android:id="@+id/nav_settings"
             android:icon="@android:drawable/ic_menu_preferences"

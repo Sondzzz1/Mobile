@@ -19,6 +19,7 @@
     <!-- Using a placeholder for avatar -->
 
     <TextView
+        android:id="@+id/tvUserName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="8dp"
@@ -30,7 +31,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/tvUserRole"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="CHỦ NHÀ"

@@ -34,13 +34,18 @@ class PhongAdapter(
         val phong = danhSach[position]
         holder.tvTenPhong.text = phong.tenPhong
         holder.tvGia.text = "${String.format("%,.0f", phong.giaCoBan.toDouble())} đ/tháng"
+        
+        // Màu sắc rõ ràng cho trạng thái phòng
         if (phong.trangThai == "trong") {
-            holder.tvTrangThai.text = "Còn trống"
-            holder.tvTrangThai.setTextColor(Color.parseColor("#4CAF50"))
+            holder.tvTrangThai.text = "CÒN TRỐNG"
+            holder.tvTrangThai.setBackgroundColor(Color.parseColor("#4CAF50")) // Xanh lá
+            holder.tvTrangThai.setTextColor(Color.WHITE)
         } else {
-            holder.tvTrangThai.text = "Đã thuê"
-            holder.tvTrangThai.setTextColor(Color.parseColor("#F44336"))
+            holder.tvTrangThai.text = "ĐÃ THUÊ"
+            holder.tvTrangThai.setBackgroundColor(Color.parseColor("#F44336")) // Đỏ
+            holder.tvTrangThai.setTextColor(Color.WHITE)
         }
+        
         holder.itemView.setOnClickListener { onItemClick(phong) }
         holder.btnEdit.setOnClickListener { onEditClick(phong) }
         holder.btnDelete.setOnClickListener { onDeleteClick(phong) }

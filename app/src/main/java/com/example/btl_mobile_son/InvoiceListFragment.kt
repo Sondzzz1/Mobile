@@ -43,47 +43,7 @@ class InvoiceListFragment : Fragment() {
         adapter = HoaDonAdapter(
             danhSach = emptyList(),
             onItemClick = { hoaDon ->
-                val statusText = when (hoaDon.trangThai) {
-                    "da_thanh_toan" -> "Đã thanh toán"
-                    "thanh_toan_mot_phan" -> "Thanh toán một phần"
-                    "qua_han" -> "Quá hạn"
-                    else -> "Chưa thanh toán"
-                }
-                AlertDialog.Builder(requireContext())
-                    .setTitle("Hóa đơn tháng ${hoaDon.thang}/${hoaDon.nam}")
-                    .setMessage("Tổng tiền: ${String.format("%,.0f", hoaDon.tongTien.toDouble())} đ\nTrạng thái: $statusText")
-                    .setPositiveButton(if (hoaDon.trangThai == "da_thanh_toan") "Đóng" else "Đánh dấu đã TT") { _, _ ->
-                        if (hoaDon.trangThai != "da_thanh_toan") {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                // Đánh dấu hóa đơn đã thanh toán
-                                dbManager.hoaDonDao.danhDauDaThanhToan(hoaDon.maHoaDon)
-                                
-                                // Tạo giao dịch thu tương ứng
-                                val hopDong = dbManager.hopDongDao.layTheoMa(hoaDon.maHopDong)
-                                val khach = hopDong?.let { dbManager.khachThueDao.layTheoMa(it.maKhach) }
-                                val phong = hopDong?.let { dbManager.phongDao.layTheoMa(it.maPhong) }
-                                
-                                dbManager.giaoDichDao.them(
-                                    com.example.btl_mobile_son.data.model.GiaoDich(
-                                        loai = "thu",
-                                        maPhong = hopDong?.maPhong,
-                                        soTien = hoaDon.tongTien,
-                                        danhMuc = "Tiền thuê phòng",
-                                        ngayGiaoDich = System.currentTimeMillis(),
-                                        noiDung = "Thu tiền phòng ${phong?.tenPhong ?: ""} tháng ${hoaDon.thang}/${hoaDon.nam}",
-                                        tenNguoi = khach?.hoTen ?: "",
-                                        phuongThucThanhToan = "tien_mat"
-                                    )
-                                )
-                                
-                                withContext(Dispatchers.Main) {
-                                    Toast.makeText(context, "Đã cập nhật và tạo giao dịch thu", Toast.LENGTH_SHORT).show()
-                                    taiDuLieu(view)
-                                }
-                            }
-                        }
-                    }
-                    .setNegativeButton("Đóng", null).show()
+                hienThiChiTietHoaDon(hoaDon, view)
             },
             onItemLongClick = { hoaDon ->
                 AlertDialog.Builder(requireContext())
@@ -140,6 +100,114 @@ class InvoiceListFragment : Fragment() {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(context, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show()
                 }
+            }
+        }
+    }
+    
+    private fun hienThiChiTietHoaDon(hoaDon: com.example.btl_mobile_son.data.model.HoaDon, view: View) {
+        CoroutineScope(Dispatchers.IO).launch {
+            // Lấy thông tin chi tiết
+            val hopDong = dbManager.hopDongDao.layTheoMa(hoaDon.maHopDong)
+            val khach = hopDong?.let { dbManager.khachThueDao.layTheoMa(it.maKhach) }
+            val phong = hopDong?.let { dbManager.phongDao.layTheoMa(it.maPhong) }
+            val nha = phong?.let { dbManager.nhaTroDao.layTheoMa(it.maNha) }
+            
+            // Lấy chi tiết điện nước
+            val chiSoDienNuoc = dbManager.chiSoDienNuocDao.layTheoThangNam(hoaDon.thang, hoaDon.nam)
+                .filter { it.maPhong == phong?.maPhong }
+            
+            withContext(Dispatchers.Main) {
+                val statusText = when (hoaDon.trangThai) {
+                    "da_thanh_toan" -> "✓ Đã thanh toán"
+                    "thanh_toan_mot_phan" -> "⚠ Thanh toán một phần"
+                    "qua_han" -> "✗ Quá hạn"
+                    else -> "○ Chưa thanh toán"
+                }
+                
+                // Tạo nội dung chi tiết
+                val chiTiet = StringBuilder()
+                chiTiet.append("━━━━━━━━━━━━━━━━━━━━━━\n")
+                chiTiet.append("📍 Nhà: ${nha?.tenNha ?: "--"}\n")
+                chiTiet.append("🚪 Phòng: ${phong?.tenPhong ?: "--"}\n")
+                chiTiet.append("👤 Khách: ${khach?.hoTen ?: "--"}\n")
+                chiTiet.append("📅 Kỳ: Tháng ${hoaDon.thang}/${hoaDon.nam}\n")
+                chiTiet.append("━━━━━━━━━━━━━━━━━━━━━━\n\n")
+                
+                chiTiet.append("CHI TIẾT:\n\n")
+                chiTiet.append("🏠 Tiền phòng:\n")
+                chiTiet.append("   ${String.format("%,d", hoaDon.tienPhong)} đ\n\n")
+                
+                if (hoaDon.tongTienDichVu > 0) {
+                    chiTiet.append("⚡ Dịch vụ:\n")
+                    for (chiSo in chiSoDienNuoc) {
+                        val loaiText = if (chiSo.loai == "dien") "Điện" else "Nước"
+                        val soTieuThu = if (chiSo.soTieuThu > 0) chiSo.soTieuThu else (chiSo.chiSoMoi - chiSo.chiSoCu)
+                        val tien = soTieuThu * chiSo.donGia
+                        chiTiet.append("   • $loaiText: ${chiSo.chiSoCu} → ${chiSo.chiSoMoi} (${soTieuThu})\n")
+                        chiTiet.append("     ${String.format("%,d", soTieuThu)} x ${String.format("%,d", chiSo.donGia)} = ${String.format("%,d", tien)} đ\n")
+                    }
+                    chiTiet.append("   Tổng dịch vụ: ${String.format("%,d", hoaDon.tongTienDichVu)} đ\n\n")
+                }
+                
+                if (hoaDon.giamGia > 0) {
+                    chiTiet.append("🎁 Giảm giá:\n")
+                    chiTiet.append("   -${String.format("%,d", hoaDon.giamGia)} đ\n\n")
+                }
+                
+                chiTiet.append("━━━━━━━━━━━━━━━━━━━━━━\n")
+                chiTiet.append("💰 TỔNG CỘNG:\n")
+                chiTiet.append("   ${String.format("%,d", hoaDon.tongTien)} đ\n")
+                chiTiet.append("━━━━━━━━━━━━━━━━━━━━━━\n\n")
+                chiTiet.append("Trạng thái: $statusText")
+                
+                val dialog = AlertDialog.Builder(requireContext())
+                    .setTitle("HÓA ĐƠN #${hoaDon.maHoaDon}")
+                    .setMessage(chiTiet.toString())
+                
+                if (hoaDon.trangThai != "da_thanh_toan") {
+                    dialog.setPositiveButton("💳 Thanh toán") { _, _ ->
+                        thanhToanHoaDon(hoaDon, view)
+                    }
+                    dialog.setNegativeButton("Đóng", null)
+                } else {
+                    dialog.setPositiveButton("Đóng", null)
+                }
+                
+                dialog.show()
+            }
+        }
+    }
+    
+    private fun thanhToanHoaDon(hoaDon: com.example.btl_mobile_son.data.model.HoaDon, view: View) {
+        CoroutineScope(Dispatchers.IO).launch {
+            // Đánh dấu hóa đơn đã thanh toán
+            dbManager.hoaDonDao.danhDauDaThanhToan(hoaDon.maHoaDon)
+            
+            // Tạo giao dịch thu tương ứng
+            val hopDong = dbManager.hopDongDao.layTheoMa(hoaDon.maHopDong)
+            val khach = hopDong?.let { dbManager.khachThueDao.layTheoMa(it.maKhach) }
+            val phong = hopDong?.let { dbManager.phongDao.layTheoMa(it.maPhong) }
+            
+            dbManager.giaoDichDao.them(
+                com.example.btl_mobile_son.data.model.GiaoDich(
+                    loai = "thu",
+                    maPhong = hopDong?.maPhong,
+                    soTien = hoaDon.tongTien,
+                    danhMuc = "Tiền thuê phòng",
+                    ngayGiaoDich = System.currentTimeMillis(),
+                    noiDung = "Thu tiền phòng ${phong?.tenPhong ?: ""} tháng ${hoaDon.thang}/${hoaDon.nam}",
+                    tenNguoi = khach?.hoTen ?: "",
+                    phuongThucThanhToan = "tien_mat"
+                )
+            )
+            
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    "✓ Đã thanh toán ${String.format("%,d", hoaDon.tongTien)} đ\nĐã tạo giao dịch thu",
+                    Toast.LENGTH_LONG
+                ).show()
+                taiDuLieu(view)
             }
         }
     }

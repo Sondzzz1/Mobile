@@ -51,6 +51,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.syncState()
         navView.setNavigationItemSelectedListener(this)
 
+        // Display user info in nav header
+        val sessionManager = SessionManager(this)
+        val headerView = navView.getHeaderView(0)
+        val tvUserName = headerView.findViewById<android.widget.TextView>(R.id.tvUserName)
+        val tvUserRole = headerView.findViewById<android.widget.TextView>(R.id.tvUserRole)
+        
+        tvUserName.text = sessionManager.getFullName()?.uppercase() ?: "NGƯỜI DÙNG"
+        tvUserRole.text = if (sessionManager.isAdmin()) "QUẢN TRỊ VIÊN" else "NHÂN VIÊN"
+
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -78,11 +87,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.nav_home -> loadFragment(HouseListFragment())  // Mở danh sách nhà trọ
+            R.id.nav_home -> loadFragment(HouseListFragment())
             R.id.nav_tenant -> loadFragment(TenantListFragment())
             R.id.nav_contract -> loadFragment(ContractListFragment())
             R.id.nav_service -> loadFragment(ServiceListFragment())
+            R.id.nav_room_service -> loadFragment(RoomServiceManagementFragment())
             R.id.nav_utility -> loadFragment(UtilityListFragment())
+            R.id.nav_stats -> loadFragment(StatisticsFragment())
+            R.id.nav_report -> loadFragment(ReportFragment())
+            R.id.nav_finance -> loadFragment(IncomeListFragment())
+            R.id.nav_issue -> loadFragment(IssueListFragment())
+            R.id.nav_permission -> {
+                // Logout
+                val sessionManager = SessionManager(this)
+                sessionManager.logout()
+                val intent = android.content.Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
         }
         drawerLayout.closeDrawer(GravityCompat.START)
         return true

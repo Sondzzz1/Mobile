@@ -28,6 +28,8 @@ class DatabaseManager private constructor(context: Context) {
     val hoaDonDao: HoaDonDao by lazy { HoaDonDao(database) }
     val chiTietHoaDonDao: ChiTietHoaDonDao by lazy { ChiTietHoaDonDao(database) }
     val giaoDichDao: GiaoDichDao by lazy { GiaoDichDao(database) }
+    val suCoDao: SuCoDao by lazy { SuCoDao(database) }
+    val nguoiDungDao: NguoiDungDao by lazy { NguoiDungDao(database) }
 
     companion object {
         @Volatile

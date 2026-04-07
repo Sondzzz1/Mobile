@@ -526,18 +526,22 @@
                     android:textStyle="bold"
                     android:textSize="14sp"
                     android:layout_marginBottom="10dp"
+                    android:drawableLeft="@android:drawable/ic_menu_view"
+                    android:drawablePadding="8dp"
                     app:cornerRadius="10dp"/>
 
                 <Button
                     android:id="@+id/btnSubmit"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
-                    android:text="✓  XÁC NHẬN TẠO HÓA ĐƠN"
+                    android:text="XÁC NHẬN TẠO HÓA ĐƠN"
                     android:textColor="@color/white"
                     android:backgroundTint="@color/colorPrimary"
                     android:textStyle="bold"
                     android:textSize="14sp"
                     android:visibility="gone"
+                    android:drawableLeft="@android:drawable/ic_menu_save"
+                    android:drawablePadding="8dp"
                     app:cornerRadius="10dp"/>
             </LinearLayout>
 

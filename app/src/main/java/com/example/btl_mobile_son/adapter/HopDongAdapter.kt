@@ -1,5 +1,6 @@
 package com.example.btl_mobile_son.adapter
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,8 +12,16 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+// Data class để chứa thông tin đầy đủ của hợp đồng
+data class HopDongDisplay(
+    val hopDong: HopDong,
+    val tenPhong: String,
+    val tenKhach: String,
+    val tenNha: String
+)
+
 class HopDongAdapter(
-    private var danhSach: List<HopDong> = emptyList(),
+    private var danhSach: List<HopDongDisplay> = emptyList(),
     private val onItemClick: (HopDong) -> Unit,
     private val onItemLongClick: (HopDong) -> Unit
 ) : RecyclerView.Adapter<HopDongAdapter.ViewHolder>() {
@@ -33,23 +42,40 @@ class HopDongAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val hd = danhSach[position]
-        holder.tvTenantName.text = "Hợp đồng #${hd.maHopDong}"
-        holder.tvDateIn.text = sdf.format(Date(hd.ngayBatDau))
-        holder.tvDateOut.text = sdf.format(Date(hd.ngayKetThuc))
-        holder.tvRoomInfo.text = "Phòng #${hd.maPhong} | ${String.format("%,.0f", hd.giaThueThang.toDouble())} đ/tháng"
-        holder.tvStatus.text = when (hd.trangThai) {
-            "dang_thue" -> "Đang thuê"
-            "het_han" -> "Hết hạn"
-            else -> "Đã hủy"
+        val item = danhSach[position]
+        val hd = item.hopDong
+        
+        holder.tvTenantName.text = "${item.tenKhach} (HĐ #${hd.maHopDong})"
+        holder.tvDateIn.text = "Từ: ${sdf.format(Date(hd.ngayBatDau))}"
+        holder.tvDateOut.text = "Đến: ${sdf.format(Date(hd.ngayKetThuc))}"
+        holder.tvRoomInfo.text = "${item.tenNha} - ${item.tenPhong} | ${String.format("%,.0f", hd.giaThueThang.toDouble())}đ/tháng"
+        
+        // Màu sắc theo trạng thái
+        when (hd.trangThai) {
+            "dang_thue" -> {
+                holder.tvStatus.text = "ĐANG THUÊ"
+                holder.tvStatus.setBackgroundColor(Color.parseColor("#4CAF50"))
+                holder.tvStatus.setTextColor(Color.WHITE)
+            }
+            "het_han" -> {
+                holder.tvStatus.text = "HẾT HẠN"
+                holder.tvStatus.setBackgroundColor(Color.parseColor("#FF9800"))
+                holder.tvStatus.setTextColor(Color.WHITE)
+            }
+            else -> {
+                holder.tvStatus.text = "ĐÃ HỦY"
+                holder.tvStatus.setBackgroundColor(Color.parseColor("#F44336"))
+                holder.tvStatus.setTextColor(Color.WHITE)
+            }
         }
+        
         holder.itemView.setOnClickListener { onItemClick(hd) }
         holder.itemView.setOnLongClickListener { onItemLongClick(hd); true }
     }
 
     override fun getItemCount() = danhSach.size
 
-    fun capNhatDanhSach(list: List<HopDong>) {
+    fun capNhatDanhSach(list: List<HopDongDisplay>) {
         danhSach = list
         notifyDataSetChanged()
     }

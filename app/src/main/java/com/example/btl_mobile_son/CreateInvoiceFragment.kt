@@ -40,6 +40,57 @@ class CreateInvoiceFragment : Fragment() {
         val formatter = NumberFormat.getNumberInstance(Locale("vi", "VN"))
         return "${formatter.format(amount)}đ"
     }
+    
+    private suspend fun tinhTienDichVu(maPhong: Long, thang: Int, nam: Int): Long {
+        var tongTienDichVu = 0L
+        
+        // 1. Tính tiền điện nước (từ bảng chi_so_dien_nuoc)
+        val chiSoDienNuoc = dbManager.chiSoDienNuocDao.layTheoThangNam(thang, nam)
+            .filter { it.maPhong == maPhong }
+
+        android.util.Log.d("CreateInvoice", "Tìm thấy ${chiSoDienNuoc.size} chỉ số điện nước cho phòng $maPhong tháng $thang/$nam")
+        
+        for (chiSo in chiSoDienNuoc) {
+            // Tính lại soTieuThu nếu = 0 (dữ liệu cũ)
+            val soTieuThu = if (chiSo.soTieuThu > 0) chiSo.soTieuThu else (chiSo.chiSoMoi - chiSo.chiSoCu)
+            val tien = soTieuThu * chiSo.donGia
+            tongTienDichVu += tien
+            android.util.Log.d("CreateInvoice", "  ${chiSo.loai}: ${chiSo.chiSoCu} → ${chiSo.chiSoMoi} (${soTieuThu}) x ${chiSo.donGia} = ${tien}đ")
+        }
+        
+        // 2. Tính tiền các dịch vụ khác (từ bảng phong_dich_vu)
+        val phongDichVu = dbManager.phongDichVuDao.layTheoPhong(maPhong)
+        android.util.Log.d("CreateInvoice", "Tìm thấy ${phongDichVu.size} dịch vụ khác cho phòng $maPhong")
+        
+        for (pdv in phongDichVu) {
+            val dichVu = dbManager.dichVuDao.layTheoMa(pdv.maDichVu)
+            if (dichVu != null && dichVu.isActive) {
+                // Sử dụng đơn giá riêng nếu có, không thì dùng đơn giá mặc định
+                val donGia = pdv.donGiaRieng?.toLong() ?: dichVu.donGia
+                
+                // Tính tiền theo cách tính của dịch vụ
+                val tien = when (dichVu.cachTinh) {
+                    "theo_phong", "theo_thang" -> donGia // Tính 1 lần/tháng
+                    "theo_nguoi" -> {
+                        // Đếm số người trong phòng (từ hợp đồng hiện tại)
+                        val hopDong = dbManager.hopDongDao.layHopDongDangThue(maPhong)
+                        val soNguoi = hopDong?.let { 
+                            dbManager.hopDongThanhVienDao.layNguoiDangOTheoHopDong(it.maHopDong).size 
+                        } ?: 1
+                        donGia * soNguoi
+                    }
+                    "mot_lan" -> 0L // Không tính vào hóa đơn hàng tháng
+                    else -> donGia
+                }
+                
+                tongTienDichVu += tien
+                android.util.Log.d("CreateInvoice", "  ${dichVu.tenDichVu}: ${donGia}đ (${dichVu.cachTinh}) = ${tien}đ")
+            }
+        }
+        
+        android.util.Log.d("CreateInvoice", "Tổng tiền dịch vụ: ${tongTienDichVu}đ")
+        return tongTienDichVu
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_create_invoice, container, false)
@@ -251,15 +302,8 @@ class CreateInvoiceFragment : Fragment() {
                 // Lấy thông tin khách thuê
                 val khachThue = dbManager.khachThueDao.layTheoMa(hopDong.maKhach)
 
-                // VĐ3: Tính tiền điện nước CHỈ từ chỉ số (không dùng dịch vụ)
-                var tongTienDichVu = 0L
-                val chiSoDienNuoc = dbManager.chiSoDienNuocDao.layTheoThangNam(thangChon, namChon)
-                    .filter { it.maPhong == phong?.maPhong }
-
-                for (chiSo in chiSoDienNuoc) {
-                    val tien = chiSo.soTieuThu * chiSo.donGia
-                    tongTienDichVu += tien
-                }
+                // Tính tiền điện nước
+                val tongTienDichVu = tinhTienDichVu(phong?.maPhong ?: 0, thangChon, namChon)
 
                 val giamGia = etDiscount.text.toString().toLongOrNull() ?: 0L
                 val tongTien = hopDong.giaThueThang + tongTienDichVu - giamGia
@@ -274,6 +318,7 @@ class CreateInvoiceFragment : Fragment() {
                     tvPreviewTotal.text = formatMoney(tongTien)
 
                     layoutPreview.visibility = View.VISIBLE
+                    btnSubmit.visibility = View.VISIBLE
                 }
             }
         }
@@ -309,15 +354,8 @@ class CreateInvoiceFragment : Fragment() {
                 // Lấy thông tin phòng
                 val phong = dbManager.phongDao.layTheoMa(hopDong.maPhong)
                 
-                // VĐ3: Tính tiền điện nước CHỈ từ chỉ số (không dùng dịch vụ)
-                var tongTienDichVu = 0L
-                val chiSoDienNuoc = dbManager.chiSoDienNuocDao.layTheoThangNam(thangChon, namChon)
-                    .filter { it.maPhong == phong?.maPhong }
-
-                for (chiSo in chiSoDienNuoc) {
-                    val tien = chiSo.soTieuThu * chiSo.donGia
-                    tongTienDichVu += tien
-                }
+                // Tính tiền điện nước
+                val tongTienDichVu = tinhTienDichVu(phong?.maPhong ?: 0, thangChon, namChon)
 
                 val giamGia = etDiscount.text.toString().toLongOrNull() ?: 0L
                 val tongTien = hopDong.giaThueThang + tongTienDichVu - giamGia

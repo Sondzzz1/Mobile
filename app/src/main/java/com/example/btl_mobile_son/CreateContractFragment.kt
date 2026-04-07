@@ -286,9 +286,30 @@ class CreateContractFragment : Fragment() {
         etFullName: EditText
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val hopDong = dbManager.hopDongDao.layTheoMa(maHopDongEdit) ?: return@launch
-            val phong = dbManager.phongDao.layTheoMa(hopDong.maPhong) ?: return@launch
+            val hopDong = dbManager.hopDongDao.layTheoMa(maHopDongEdit)
+            if (hopDong == null) {
+                android.util.Log.e("CreateContract", "Không tìm thấy hợp đồng #$maHopDongEdit")
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Lỗi: Không tìm thấy hợp đồng", Toast.LENGTH_SHORT).show()
+                }
+                return@launch
+            }
+            
+            android.util.Log.d("CreateContract", "Load hợp đồng #${hopDong.maHopDong}: maPhong=${hopDong.maPhong}, maKhach=${hopDong.maKhach}, gia=${hopDong.giaThueThang}")
+            
+            val phong = dbManager.phongDao.layTheoMa(hopDong.maPhong)
+            if (phong == null) {
+                android.util.Log.e("CreateContract", "Không tìm thấy phòng #${hopDong.maPhong}")
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Lỗi: Không tìm thấy phòng", Toast.LENGTH_SHORT).show()
+                }
+                return@launch
+            }
+            
             val khach = dbManager.khachThueDao.layTheoMa(hopDong.maKhach)
+            if (khach == null) {
+                android.util.Log.e("CreateContract", "Không tìm thấy khách #${hopDong.maKhach}")
+            }
 
             withContext(Dispatchers.Main) {
                 // Set ngày
@@ -302,9 +323,12 @@ class CreateContractFragment : Fragment() {
                 etDeposit.setText(hopDong.tienDatCoc.toLong().toString())
 
                 // Set thông tin khách
-                khach?.let {
-                    etFullName.setText(it.hoTen)
-                    etPhone.setText(it.soDienThoai)
+                if (khach != null) {
+                    etFullName.setText(khach.hoTen)
+                    etPhone.setText(khach.soDienThoai)
+                    android.util.Log.d("CreateContract", "Đã load thông tin khách: ${khach.hoTen}, ${khach.soDienThoai}")
+                } else {
+                    android.util.Log.w("CreateContract", "Khách thuê null, không thể điền thông tin")
                 }
 
                 // Set spinner nhà
@@ -320,9 +344,12 @@ class CreateContractFragment : Fragment() {
                             val viTriPhong = danhSachPhong.indexOfFirst { it.maPhong == phong.maPhong }
                             if (viTriPhong >= 0) {
                                 spinnerRoom.setSelection(viTriPhong)
+                                android.util.Log.d("CreateContract", "Đã chọn phòng: ${phong.tenPhong}")
                             }
                         }
                     }
+                } else {
+                    android.util.Log.e("CreateContract", "Không tìm thấy nhà trong danh sách")
                 }
             }
         }

@@ -104,10 +104,25 @@ class ContractListFragment : Fragment() {
     private fun taiDuLieu(view: View) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val danhSach = dbManager.hopDongDao.layTatCa()
+                val danhSachHopDong = dbManager.hopDongDao.layTatCa()
+                
+                // Load thông tin đầy đủ cho mỗi hợp đồng
+                val danhSachHienThi = danhSachHopDong.map { hopDong ->
+                    val phong = dbManager.phongDao.layTheoMa(hopDong.maPhong)
+                    val khach = dbManager.khachThueDao.layTheoMa(hopDong.maKhach)
+                    val nha = phong?.let { dbManager.nhaTroDao.layTheoMa(it.maNha) }
+                    
+                    com.example.btl_mobile_son.adapter.HopDongDisplay(
+                        hopDong = hopDong,
+                        tenPhong = phong?.tenPhong ?: "Phòng #${hopDong.maPhong}",
+                        tenKhach = khach?.hoTen ?: "Khách #${hopDong.maKhach}",
+                        tenNha = nha?.tenNha ?: "Nhà trọ"
+                    )
+                }
+                
                 withContext(Dispatchers.Main) {
-                    adapter.capNhatDanhSach(danhSach)
-                    view.findViewById<TextView>(R.id.tvContractCount)?.text = "${danhSach.size}"
+                    adapter.capNhatDanhSach(danhSachHienThi)
+                    view.findViewById<TextView>(R.id.tvContractCount)?.text = "${danhSachHienThi.size}"
                 }
             } catch (e: Exception) {
                 android.util.Log.e("ContractListFragment", "Error loading data", e)

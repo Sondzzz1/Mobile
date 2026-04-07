@@ -73,6 +73,7 @@ class RoomDetailFragment : Fragment() {
                     0 -> hienThiTabThongTin(contentContainer)
                     1 -> hienThiTabKhachThue(contentContainer)
                     2 -> hienThiTabHopDong(contentContainer)
+                    3 -> hienThiTabDichVu(contentContainer)
                 }
             }
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
@@ -197,13 +198,108 @@ class RoomDetailFragment : Fragment() {
             tvLichSuTitle.visibility = View.VISIBLE
             rvLichSu.visibility = View.VISIBLE
             rvLichSu.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
-            rvLichSu.adapter = com.example.btl_mobile_son.adapter.HopDongAdapter(
-                danhSach = lichSuCu,
-                onItemClick = {},
-                onItemLongClick = {}
-            )
+            
+            // Load thông tin đầy đủ cho lịch sử hợp đồng
+            CoroutineScope(Dispatchers.IO).launch {
+                val danhSachHienThi = lichSuCu.map { hopDong ->
+                    val khach = dbManager.khachThueDao.layTheoMa(hopDong.maKhach)
+                    
+                    com.example.btl_mobile_son.adapter.HopDongDisplay(
+                        hopDong = hopDong,
+                        tenPhong = phong?.tenPhong ?: "Phòng #${hopDong.maPhong}",
+                        tenKhach = khach?.hoTen ?: "Khách #${hopDong.maKhach}",
+                        tenNha = nha?.tenNha ?: "Nhà trọ"
+                    )
+                }
+                
+                withContext(Dispatchers.Main) {
+                    rvLichSu.adapter = com.example.btl_mobile_son.adapter.HopDongAdapter(
+                        danhSach = danhSachHienThi,
+                        onItemClick = {},
+                        onItemLongClick = {}
+                    )
+                }
+            }
         }
 
+        container.addView(v)
+    }
+    
+    private fun hienThiTabDichVu(container: FrameLayout) {
+        container.removeAllViews()
+        val v = layoutInflater.inflate(R.layout.layout_room_services, container, false)
+        
+        val rvDichVu = v.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvDichVuPhong)
+        val layoutEmpty = v.findViewById<View>(R.id.layoutEmptyService)
+        
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Lấy danh sách dịch vụ của nhà
+                val maNha = phong?.maNha ?: -1L
+                val danhSachDichVu = dbManager.dichVuDao.layTatCa()
+                    .filter { it.maNha == maNha && it.isActive }
+                
+                // Lấy danh sách dịch vụ đã chọn cho phòng này
+                val dichVuDaChon = dbManager.phongDichVuDao.layTheoPhong(maPhong)
+                    .map { it.maDichVu }
+                
+                // Tạo danh sách item với trạng thái checked
+                val items = danhSachDichVu.map { dv ->
+                    com.example.btl_mobile_son.adapter.DichVuPhongItem(
+                        dichVu = dv,
+                        isChecked = dichVuDaChon.contains(dv.maDichVu)
+                    )
+                }
+                
+                withContext(Dispatchers.Main) {
+                    if (items.isEmpty()) {
+                        rvDichVu.visibility = View.GONE
+                        layoutEmpty.visibility = View.VISIBLE
+                    } else {
+                        rvDichVu.visibility = View.VISIBLE
+                        layoutEmpty.visibility = View.GONE
+                        
+                        rvDichVu.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
+                        rvDichVu.adapter = com.example.btl_mobile_son.adapter.PhongDichVuAdapter(
+                            danhSach = items,
+                            onCheckChanged = { dichVu, isChecked ->
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    if (isChecked) {
+                                        // Thêm dịch vụ vào phòng
+                                        val phongDichVu = com.example.btl_mobile_son.data.model.PhongDichVu(
+                                            maPhong = maPhong,
+                                            maDichVu = dichVu.maDichVu,
+                                            donGiaRieng = null,
+                                            ghiChu = ""
+                                        )
+                                        dbManager.phongDichVuDao.them(phongDichVu)
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(context, "✓ Đã thêm ${dichVu.tenDichVu}", Toast.LENGTH_SHORT).show()
+                                        }
+                                    } else {
+                                        // Xóa dịch vụ khỏi phòng
+                                        val pdv = dbManager.phongDichVuDao.layTheoPhong(maPhong)
+                                            .find { it.maDichVu == dichVu.maDichVu }
+                                        pdv?.let {
+                                            dbManager.phongDichVuDao.xoa(it.maPhongDichVu)
+                                            withContext(Dispatchers.Main) {
+                                                Toast.makeText(context, "✓ Đã xóa ${dichVu.tenDichVu}", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("RoomDetailFragment", "Error loading services", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Lỗi tải dịch vụ", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        
         container.addView(v)
     }
 }

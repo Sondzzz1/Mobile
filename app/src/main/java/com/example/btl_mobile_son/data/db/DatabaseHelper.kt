@@ -8,7 +8,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "quan_ly_nha_tro.db"
-        private const val DATABASE_VERSION = 8  // Tăng lên 8 để trigger migration
+        private const val DATABASE_VERSION = 9  // Tăng lên 9 để thêm bảng sự cố và người dùng
 
         // Tên bảng
         const val TABLE_NHA_TRO = "nha_tro"
@@ -17,12 +17,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val TABLE_HOP_DONG = "hop_dong"
         const val TABLE_HOP_DONG_THANH_VIEN = "hop_dong_thanh_vien"
         const val TABLE_DICH_VU = "dich_vu"
-        const val TABLE_PHONG_DICH_VU = "phong_dich_vu" // VĐ1: Bảng mới
+        const val TABLE_PHONG_DICH_VU = "phong_dich_vu"
         const val TABLE_DAT_COC = "dat_coc"
         const val TABLE_CHI_SO_DIEN_NUOC = "chi_so_dien_nuoc"
         const val TABLE_HOA_DON = "hoa_don"
         const val TABLE_CHI_TIET_HOA_DON = "chi_tiet_hoa_don"
         const val TABLE_GIAO_DICH = "giao_dich"
+        const val TABLE_SU_CO = "su_co"
+        const val TABLE_NGUOI_DUNG = "nguoi_dung"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -230,6 +232,45 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 FOREIGN KEY (ma_dat_coc) REFERENCES $TABLE_DAT_COC(ma_dat_coc) ON DELETE SET NULL
             )
         """)
+
+        // Bảng Sự cố
+        db.execSQL("""
+            CREATE TABLE $TABLE_SU_CO (
+                ma_su_co INTEGER PRIMARY KEY AUTOINCREMENT,
+                ma_phong INTEGER NOT NULL,
+                loai_su_co TEXT NOT NULL,
+                mo_ta TEXT,
+                trang_thai TEXT DEFAULT 'chua_xu_ly',
+                nguoi_bao_cao TEXT,
+                nguoi_xu_ly TEXT,
+                ngay_bao_cao INTEGER DEFAULT 0,
+                ngay_xu_ly INTEGER,
+                chi_phi REAL DEFAULT 0,
+                ghi_chu TEXT,
+                FOREIGN KEY (ma_phong) REFERENCES $TABLE_PHONG(ma_phong) ON DELETE CASCADE
+            )
+        """)
+
+        // Bảng Người dùng
+        db.execSQL("""
+            CREATE TABLE $TABLE_NGUOI_DUNG (
+                ma_nguoi_dung INTEGER PRIMARY KEY AUTOINCREMENT,
+                ten_dang_nhap TEXT NOT NULL UNIQUE,
+                mat_khau TEXT NOT NULL,
+                ho_ten TEXT NOT NULL,
+                vai_tro TEXT DEFAULT 'nhan_vien',
+                so_dien_thoai TEXT,
+                email TEXT,
+                trang_thai TEXT DEFAULT 'hoat_dong',
+                ngay_tao INTEGER DEFAULT 0
+            )
+        """)
+
+        // Tạo tài khoản admin mặc định (mật khẩu: admin123)
+        db.execSQL("""
+            INSERT INTO $TABLE_NGUOI_DUNG (ten_dang_nhap, mat_khau, ho_ten, vai_tro, ngay_tao)
+            VALUES ('admin', 'admin123', 'Quản trị viên', 'admin', ${System.currentTimeMillis()})
+        """)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -238,6 +279,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         android.util.Log.d("DatabaseHelper", "Upgrading database from $oldVersion to $newVersion")
         
         // Drop tất cả các bảng theo thứ tự ngược lại (để tránh foreign key constraint)
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_NGUOI_DUNG")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_SU_CO")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_GIAO_DICH")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_CHI_TIET_HOA_DON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_HOA_DON")
@@ -260,6 +303,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         // Xử lý downgrade (từ version cao xuống thấp)
         android.util.Log.d("DatabaseHelper", "Downgrading database from $oldVersion to $newVersion")
         // Drop tất cả và tạo lại
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_NGUOI_DUNG")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_SU_CO")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_GIAO_DICH")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_CHI_TIET_HOA_DON")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_HOA_DON")
