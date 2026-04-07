@@ -105,7 +105,8 @@ class InvoiceListFragment : Fragment() {
     }
 
     private fun applyFilters(view: View?) {
-        val tuKhoa = view?.findViewById<EditText>(R.id.etSearchInvoice)?.text.toString().trim().lowercase()
+        val searchView = view?.findViewById<EditText>(R.id.etSearchInvoice)
+        val tuKhoa = searchView?.text?.toString()?.trim()?.lowercase() ?: ""
         
         CoroutineScope(Dispatchers.IO).launch {
             var filtered = danhSachDayDu

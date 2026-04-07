@@ -82,41 +82,45 @@
             android:background="@drawable/bottom_rounded_corners" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Search and Filter Bar -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:background="@android:color/white"
-        android:elevation="4dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <EditText
-            android:id="@+id/etSearchInvoice"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="48dp"
-            android:hint="Tìm theo phòng, khách..."
-            android:drawableStart="@android:drawable/ic_menu_search"
-            android:drawablePadding="8dp"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:background="@android:drawable/edit_text"
-            android:layout_marginEnd="8dp" />
-
-        <Spinner
-            android:id="@+id/spinnerStatusFilter"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:minWidth="120dp" />
-    </LinearLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="60dp"
+        android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <!-- Search and Filter Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:background="@android:color/white"
+            android:elevation="4dp">
+
+            <EditText
+                android:id="@+id/etSearchInvoice"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="48dp"
+                android:hint="Tìm theo phòng, khách..."
+                android:drawableStart="@android:drawable/ic_menu_search"
+                android:drawablePadding="8dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:background="@android:drawable/edit_text"
+                android:layout_marginEnd="8dp" />
+
+            <Spinner
+                android:id="@+id/spinnerStatusFilter"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:minWidth="120dp" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
         <!-- RecyclerView for Data Rows -->
         <androidx.recyclerview.widget.RecyclerView
@@ -127,7 +131,8 @@
             android:clipToPadding="false"
             tools:listitem="@layout/item_invoice" />
 
-    </FrameLayout>
+        </FrameLayout>
+    </LinearLayout>
 
     <!-- Bottom summary bar -->
     <LinearLayout

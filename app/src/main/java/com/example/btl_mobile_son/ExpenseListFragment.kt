@@ -120,7 +120,8 @@ class ExpenseListFragment : Fragment() {
     }
 
     private fun applyFilters(recyclerView: RecyclerView, tvEmpty: TextView, tvTong: TextView) {
-        val tuKhoa = view?.findViewById<EditText>(R.id.etSearchExpense)?.text.toString().trim().lowercase()
+        val searchView = view?.findViewById<EditText>(R.id.etSearchExpense)
+        val tuKhoa = searchView?.text?.toString()?.trim()?.lowercase() ?: ""
         
         var filtered = danhSachDayDu
         
