@@ -2,13 +2,12 @@ package com.example.btl_mobile_son
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +23,8 @@ class InvoiceListFragment : Fragment() {
 
     private lateinit var dbManager: DatabaseManager
     private lateinit var adapter: HoaDonAdapter
+    private var danhSachDayDu = listOf<com.example.btl_mobile_son.data.model.HoaDon>()
+    private var statusFilter = "all"
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_invoice_list, container, false)
@@ -74,7 +75,64 @@ class InvoiceListFragment : Fragment() {
                 .addToBackStack(null).commit()
         }
 
+        // Status filter spinner
+        val spinnerStatus = view.findViewById<Spinner>(R.id.spinnerStatusFilter)
+        val statusOptions = arrayOf("Tất cả", "Chưa TT", "Đã TT", "Quá hạn")
+        spinnerStatus.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, statusOptions)
+        spinnerStatus.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                statusFilter = when (position) {
+                    1 -> "chua_thanh_toan"
+                    2 -> "da_thanh_toan"
+                    3 -> "qua_han"
+                    else -> "all"
+                }
+                applyFilters(view)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        // Search
+        view.findViewById<EditText>(R.id.etSearchInvoice)?.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                applyFilters(view)
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
         taiDuLieu(view)
+    }
+
+    private fun applyFilters(view: View?) {
+        val tuKhoa = view?.findViewById<EditText>(R.id.etSearchInvoice)?.text.toString().trim().lowercase()
+        
+        CoroutineScope(Dispatchers.IO).launch {
+            var filtered = danhSachDayDu
+            
+            // Filter by status
+            if (statusFilter != "all") {
+                filtered = filtered.filter { it.trangThai == statusFilter }
+            }
+            
+            // Filter by search keyword
+            if (tuKhoa.isNotEmpty()) {
+                filtered = filtered.filter { hoaDon ->
+                    val hopDong = dbManager.hopDongDao.layTheoMa(hoaDon.maHopDong)
+                    val khach = hopDong?.let { dbManager.khachThueDao.layTheoMa(it.maKhach) }
+                    val phong = hopDong?.let { dbManager.phongDao.layTheoMa(it.maPhong) }
+                    
+                    hoaDon.maHoaDon.toString().contains(tuKhoa) ||
+                    khach?.hoTen?.lowercase()?.contains(tuKhoa) == true ||
+                    phong?.tenPhong?.lowercase()?.contains(tuKhoa) == true ||
+                    "${hoaDon.thang}/${hoaDon.nam}".contains(tuKhoa)
+                }
+            }
+            
+            withContext(Dispatchers.Main) {
+                adapter.capNhatDanhSach(filtered)
+            }
+        }
     }
 
     override fun onResume() {
@@ -91,6 +149,7 @@ class InvoiceListFragment : Fragment() {
                 val danhSach = dbManager.hoaDonDao.layTatCa()
                 val tongChuaTT = dbManager.hoaDonDao.tinhTongChuaThanhToan()
                 withContext(Dispatchers.Main) {
+                    danhSachDayDu = danhSach
                     adapter.capNhatDanhSach(danhSach)
                     view.findViewById<TextView>(R.id.tvTotalInvoices)?.text = "Tổng tiền (${danhSach.size} hóa đơn)"
                     view.findViewById<TextView>(R.id.tvTotalAmount)?.text = "${String.format("%,.0f", tongChuaTT.toDouble())} đ"

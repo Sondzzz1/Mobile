@@ -2,10 +2,13 @@ package com.example.btl_mobile_son
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -23,6 +26,7 @@ class ContractListFragment : Fragment() {
 
     private lateinit var dbManager: DatabaseManager
     private lateinit var adapter: HopDongAdapter
+    private var danhSachDayDu = listOf<com.example.btl_mobile_son.adapter.HopDongDisplay>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_contract_list, container, false)
@@ -93,6 +97,26 @@ class ContractListFragment : Fragment() {
                 .addToBackStack(null).commit()
         }
 
+        // Tìm kiếm
+        view.findViewById<EditText>(R.id.etSearchContract)?.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val tuKhoa = s.toString().trim().lowercase()
+                if (tuKhoa.isEmpty()) {
+                    adapter.capNhatDanhSach(danhSachDayDu)
+                } else {
+                    val filtered = danhSachDayDu.filter { hd ->
+                        hd.hopDong.maHopDong.toString().contains(tuKhoa) ||
+                        hd.tenKhach.lowercase().contains(tuKhoa) ||
+                        hd.tenPhong.lowercase().contains(tuKhoa) ||
+                        hd.tenNha.lowercase().contains(tuKhoa)
+                    }
+                    adapter.capNhatDanhSach(filtered)
+                }
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
         taiDuLieu(view)
     }
 
@@ -121,6 +145,7 @@ class ContractListFragment : Fragment() {
                 }
                 
                 withContext(Dispatchers.Main) {
+                    danhSachDayDu = danhSachHienThi
                     adapter.capNhatDanhSach(danhSachHienThi)
                     view.findViewById<TextView>(R.id.tvContractCount)?.text = "${danhSachHienThi.size}"
                 }

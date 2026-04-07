@@ -1,13 +1,12 @@
 package com.example.btl_mobile_son
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,6 +26,8 @@ class IncomeListFragment : Fragment() {
     private lateinit var dbManager: DatabaseManager
     private lateinit var adapter: GiaoDichAdapter
     private val danhSach = mutableListOf<GiaoDich>()
+    private var danhSachDayDu = listOf<GiaoDich>()
+    private var categoryFilter = "all"
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_income_list, container, false)
@@ -85,7 +86,67 @@ class IncomeListFragment : Fragment() {
                 .addToBackStack(null).commit()
         }
 
+        // Category filter
+        val spinnerCategory = view.findViewById<Spinner>(R.id.spinnerCategoryFilter)
+        val categories = arrayOf("Tất cả", "Tiền thuê", "Điện", "Nước", "Dịch vụ", "Đặt cọc", "Khác")
+        spinnerCategory.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, categories)
+        spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                categoryFilter = when (position) {
+                    1 -> "Tiền thuê phòng"
+                    2 -> "Tiền điện"
+                    3 -> "Tiền nước"
+                    4 -> "Dịch vụ"
+                    5 -> "Đặt cọc"
+                    6 -> "Khác"
+                    else -> "all"
+                }
+                applyFilters(recyclerView, tvEmpty, tvTongThu)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        // Search
+        view.findViewById<EditText>(R.id.etSearchIncome)?.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                applyFilters(recyclerView, tvEmpty, tvTongThu)
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
         taiDuLieu(recyclerView, tvEmpty, tvTongThu)
+    }
+
+    private fun applyFilters(recyclerView: RecyclerView, tvEmpty: TextView, tvTong: TextView) {
+        val tuKhoa = view?.findViewById<EditText>(R.id.etSearchIncome)?.text.toString().trim().lowercase()
+        
+        var filtered = danhSachDayDu
+        
+        // Filter by category
+        if (categoryFilter != "all") {
+            filtered = filtered.filter { it.danhMuc == categoryFilter }
+        }
+        
+        // Filter by search keyword
+        if (tuKhoa.isNotEmpty()) {
+            filtered = filtered.filter { gd ->
+                gd.noiDung.lowercase().contains(tuKhoa) ||
+                gd.danhMuc.lowercase().contains(tuKhoa) ||
+                gd.tenNguoi.lowercase().contains(tuKhoa)
+            }
+        }
+        
+        danhSach.clear()
+        danhSach.addAll(filtered)
+        adapter.notifyDataSetChanged()
+        
+        tvEmpty.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
+        recyclerView.visibility = if (filtered.isEmpty()) View.GONE else View.VISIBLE
+        
+        val tong = filtered.sumOf { it.soTien }
+        val fmt = NumberFormat.getNumberInstance(Locale("vi", "VN"))
+        tvTong.text = "Tổng thu: ${fmt.format(tong)} đ"
     }
 
     override fun onResume() {
@@ -102,6 +163,7 @@ class IncomeListFragment : Fragment() {
                 val ds = dbManager.giaoDichDao.layTheoLoai("thu")
                 val tong = dbManager.giaoDichDao.tinhTongTheoLoai("thu")
                 withContext(Dispatchers.Main) {
+                    danhSachDayDu = ds
                     danhSach.clear()
                     danhSach.addAll(ds)
                     adapter.notifyDataSetChanged()
