@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:background="@color/colorPrimary"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:contentDescription="Logo"
+        android:paddingTop="8dp"
+        android:src="@drawable/ic_app_logo" />
+        
+    <!-- Using a placeholder for avatar -->
+
+    <TextView
+        android:id="@+id/tvUserName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:text="PHAN DUY SƠN"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+    <TextView
+        android:id="@+id/tvUserRole"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CHỦ NHÀ"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="14sp" />
+</LinearLayout>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- App Bar -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/surface"
+            android:paddingHorizontal="16dp"
+            android:elevation="2dp">
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                app:tint="@color/textPrimary"
+                android:layout_centerVertical="true"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TẠO PHÒNG"
+                android:textAllCaps="true"
+                android:textColor="@color/textPrimary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@color/surface">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tên phòng *"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp"/>
+            <EditText
+                android:id="@+id/etRoomName"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:hint="VD: Phòng 101"
+                android:paddingHorizontal="12dp"
+                android:inputType="text"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Giá thuê (đ/tháng) *"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp"/>
+            <EditText
+                android:id="@+id/etRoomPrice"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:hint="VD: 2000000"
+                android:paddingHorizontal="12dp"
+                android:inputType="numberDecimal"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Diện tích (m²)"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp"/>
+            <EditText
+                android:id="@+id/etRoomArea"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:hint="VD: 20"
+                android:paddingHorizontal="12dp"
+                android:inputType="numberDecimal"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Số người tối đa"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp"/>
+            <EditText
+                android:id="@+id/etMaxTenant"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_bg"
+                android:hint="VD: 2"
+                android:paddingHorizontal="12dp"
+                android:inputType="number"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ghi chú"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp"/>
+            <EditText
+                android:id="@+id/etNote"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:background="@drawable/edit_text_bg"
+                android:hint="Ghi chú thêm..."
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="8dp"
+                android:gravity="top"
+                android:inputType="textMultiLine|textCapSentences"
+                android:layout_marginBottom="24dp"/>
+
+            <Button
+                android:id="@+id/btnSubmit"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="LƯU PHÒNG"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/colorSecondary"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                app:cornerRadius="8dp"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
