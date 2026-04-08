@@ -18,24 +18,49 @@ import kotlinx.coroutines.withContext
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var drawerLayout: DrawerLayout
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Kiểm tra session - nếu chưa đăng nhập hoặc không phải admin, chuyển về LoginActivity
+        sessionManager = SessionManager(this)
+        if (!sessionManager.isLoggedIn()) {
+            val intent = android.content.Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
+        
+        // Nếu là tenant, chuyển sang TenantMainActivity
+        if (sessionManager.isTenant()) {
+            val intent = android.content.Intent(this, TenantMainActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
+        
+        // Chỉ admin mới vào MainActivity
+        if (!sessionManager.isAdmin()) {
+            sessionManager.logout()
+            val intent = android.content.Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
+        
         setContentView(R.layout.activity_main)
 
-        // Load sample data lần đầu
+        // Cập nhật trạng thái hợp đồng hết hạn
         lifecycleScope.launch {
             try {
-                SampleDataHelper(this@MainActivity).loadSampleDataIfNeeded()
-                
-                // Cập nhật trạng thái hợp đồng hết hạn
                 withContext(Dispatchers.IO) {
                     val dbManager = com.example.btl_mobile_son.data.db.DatabaseManager.getInstance(this@MainActivity)
                     dbManager.hopDongDao.capNhatHopDongHetHan()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                android.util.Log.e("MainActivity", "Error loading data", e)
+                android.util.Log.e("MainActivity", "Error updating contracts", e)
             }
         }
 
@@ -52,7 +77,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navView.setNavigationItemSelectedListener(this)
 
         // Display user info in nav header
-        val sessionManager = SessionManager(this)
         val headerView = navView.getHeaderView(0)
         val tvUserName = headerView.findViewById<android.widget.TextView>(R.id.tvUserName)
         val tvUserRole = headerView.findViewById<android.widget.TextView>(R.id.tvUserRole)
@@ -108,7 +132,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.nav_permission -> {
                 // Logout
-                val sessionManager = SessionManager(this)
                 sessionManager.logout()
                 val intent = android.content.Intent(this, LoginActivity::class.java)
                 startActivity(intent)

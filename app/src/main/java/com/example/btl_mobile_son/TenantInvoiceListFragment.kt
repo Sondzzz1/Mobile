@@ -32,39 +32,49 @@ class TenantInvoiceListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dbManager = DatabaseManager.getInstance(requireContext())
-        sessionManager = SessionManager(requireContext())
-        maKhach = sessionManager.getUserId().toLong()
+        try {
+            dbManager = DatabaseManager.getInstance(requireContext())
+            sessionManager = SessionManager(requireContext())
+            maKhach = sessionManager.getUserId().toLong()
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.rvTenantInvoices)
-        recyclerView.layoutManager = LinearLayoutManager(context)
+            val recyclerView = view.findViewById<RecyclerView>(R.id.rvTenantInvoices)
+            recyclerView.layoutManager = LinearLayoutManager(context)
 
-        adapter = HoaDonAdapter(
-            onItemClick = { hoaDon ->
-                // Show invoice details
-                android.widget.Toast.makeText(context, "Chi tiết hóa đơn #${hoaDon.maHoaDon}", android.widget.Toast.LENGTH_SHORT).show()
-            },
-            onItemLongClick = { hoaDon ->
-                // Tenant cannot edit
-                false
-            }
-        )
-        recyclerView.adapter = adapter
+            adapter = HoaDonAdapter(
+                onItemClick = { hoaDon ->
+                    // Show invoice details
+                    android.widget.Toast.makeText(context, "Chi tiết hóa đơn #${hoaDon.maHoaDon}", android.widget.Toast.LENGTH_SHORT).show()
+                },
+                onItemLongClick = { hoaDon ->
+                    // Tenant cannot edit
+                    false
+                }
+            )
+            recyclerView.adapter = adapter
 
-        loadInvoices()
+            loadInvoices()
+        } catch (e: Exception) {
+            android.util.Log.e("TenantInvoiceList", "Error in onViewCreated", e)
+            android.widget.Toast.makeText(context, "Lỗi khởi tạo: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun loadInvoices() {
         lifecycleScope.launch {
             try {
                 val invoices = withContext(Dispatchers.IO) {
-                    // Get active contract
-                    val hopDong = dbManager.hopDongDao.layHopDongHienTaiCuaKhach(maKhach)
-                    
-                    if (hopDong != null) {
-                        // Get all invoices for this contract
-                        dbManager.hoaDonDao.layTatCa().filter { it.maHopDong == hopDong.maHopDong }
-                    } else {
+                    try {
+                        // Get active contract
+                        val hopDong = dbManager.hopDongDao.layHopDongHienTaiCuaKhach(maKhach)
+                        
+                        if (hopDong != null) {
+                            // Get all invoices for this contract
+                            dbManager.hoaDonDao.layTatCa().filter { it.maHopDong == hopDong.maHopDong }
+                        } else {
+                            emptyList()
+                        }
+                    } catch (e: Exception) {
+                        android.util.Log.e("TenantInvoiceList", "Error loading invoices", e)
                         emptyList()
                     }
                 }
@@ -77,7 +87,8 @@ class TenantInvoiceListFragment : Fragment() {
                     view?.findViewById<android.widget.TextView>(R.id.tvEmptyInvoices)?.visibility = View.GONE
                 }
             } catch (e: Exception) {
-                android.widget.Toast.makeText(context, "Lỗi: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                android.util.Log.e("TenantInvoiceList", "Error in loadInvoices", e)
+                android.widget.Toast.makeText(context, "Lỗi tải hóa đơn: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
             }
         }
     }

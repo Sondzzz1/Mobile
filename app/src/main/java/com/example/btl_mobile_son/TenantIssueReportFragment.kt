@@ -64,14 +64,19 @@ class TenantIssueReportFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 val data = withContext(Dispatchers.IO) {
-                    val hopDong = dbManager.hopDongDao.layHopDongHienTaiCuaKhach(maKhach)
-                    val phongId = hopDong?.maPhong?.toInt() ?: 0
-                    val issues = if (phongId > 0) {
-                        dbManager.suCoDao.layTheoPhong(phongId)
-                    } else {
-                        emptyList()
+                    try {
+                        val hopDong = dbManager.hopDongDao.layHopDongHienTaiCuaKhach(maKhach)
+                        val phongId = hopDong?.maPhong?.toInt() ?: 0
+                        val issues = if (phongId > 0) {
+                            dbManager.suCoDao.layTheoPhong(phongId)
+                        } else {
+                            emptyList()
+                        }
+                        Pair(phongId, issues)
+                    } catch (e: Exception) {
+                        android.util.Log.e("TenantIssueReport", "Error loading data", e)
+                        Pair(0, emptyList())
                     }
-                    Pair(phongId, issues)
                 }
 
                 maPhong = data.first.toLong()
@@ -85,7 +90,8 @@ class TenantIssueReportFragment : Fragment() {
                     view?.findViewById<android.widget.TextView>(R.id.tvEmptyIssues)?.visibility = View.GONE
                 }
             } catch (e: Exception) {
-                android.widget.Toast.makeText(context, "Lỗi: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                android.util.Log.e("TenantIssueReport", "Error in loadRoomAndIssues", e)
+                android.widget.Toast.makeText(context, "Lỗi tải dữ liệu: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
             }
         }
     }

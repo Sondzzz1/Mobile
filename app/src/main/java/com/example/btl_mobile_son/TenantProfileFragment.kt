@@ -34,30 +34,40 @@ class TenantProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dbManager = DatabaseManager.getInstance(requireContext())
-        sessionManager = SessionManager(requireContext())
-        maKhach = sessionManager.getUserId().toLong()
+        try {
+            dbManager = DatabaseManager.getInstance(requireContext())
+            sessionManager = SessionManager(requireContext())
+            maKhach = sessionManager.getUserId().toLong()
 
-        view.findViewById<Button>(R.id.btnUpdateProfile).setOnClickListener {
-            updateProfile()
+            view.findViewById<Button>(R.id.btnUpdateProfile)?.setOnClickListener {
+                updateProfile()
+            }
+
+            view.findViewById<Button>(R.id.btnChangePassword)?.setOnClickListener {
+                changePassword()
+            }
+
+            view.findViewById<Button>(R.id.btnLogout)?.setOnClickListener {
+                logout()
+            }
+
+            loadProfile()
+        } catch (e: Exception) {
+            android.util.Log.e("TenantProfile", "Error in onViewCreated", e)
+            android.widget.Toast.makeText(context, "Lỗi khởi tạo: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
         }
-
-        view.findViewById<Button>(R.id.btnChangePassword).setOnClickListener {
-            changePassword()
-        }
-
-        view.findViewById<Button>(R.id.btnLogout).setOnClickListener {
-            logout()
-        }
-
-        loadProfile()
     }
 
     private fun loadProfile() {
         lifecycleScope.launch {
             try {
                 khachThue = withContext(Dispatchers.IO) {
-                    dbManager.khachThueDao.layTheoMa(maKhach)
+                    try {
+                        dbManager.khachThueDao.layTheoMa(maKhach)
+                    } catch (e: Exception) {
+                        android.util.Log.e("TenantProfile", "Error loading profile", e)
+                        null
+                    }
                 }
 
                 khachThue?.let { kt ->
@@ -65,9 +75,12 @@ class TenantProfileFragment : Fragment() {
                     view?.findViewById<EditText>(R.id.etProfilePhone)?.setText(kt.soDienThoai)
                     view?.findViewById<EditText>(R.id.etProfileEmail)?.setText(kt.email)
                     view?.findViewById<TextView>(R.id.tvProfileCMND)?.text = "CMND/CCCD: ${kt.soCmnd}"
+                } ?: run {
+                    android.widget.Toast.makeText(context, "Không tìm thấy thông tin người dùng", android.widget.Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                android.widget.Toast.makeText(context, "Lỗi: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                android.util.Log.e("TenantProfile", "Error in loadProfile", e)
+                android.widget.Toast.makeText(context, "Lỗi tải thông tin: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
             }
         }
     }
