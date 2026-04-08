@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.btl_mobile_son.adapter.DichVuAdapter
 import com.example.btl_mobile_son.data.db.DatabaseManager
 import com.example.btl_mobile_son.data.model.DichVu
+import com.example.btl_mobile_son.utils.UIHelper
+import com.example.btl_mobile_son.utils.CurrencyHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -98,19 +100,19 @@ class ServiceListFragment : Fragment() {
                     .addToBackStack(null).commit()
             },
             onDelete = { dichVu ->
-                AlertDialog.Builder(requireContext())
-                    .setTitle("Xóa dịch vụ")
-                    .setMessage("Xóa dịch vụ '${dichVu.tenDichVu}' (${dichVu.donGia.toLong()}đ)?")
-                    .setPositiveButton("Xóa") { _, _ ->
-                        CoroutineScope(Dispatchers.IO).launch {
-                            dbManager.dichVuDao.xoa(dichVu.maDichVu)
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(context, "✓ Đã xóa", Toast.LENGTH_SHORT).show()
-                                taiDuLieu(recyclerView, tvEmpty)
-                            }
+                UIHelper.showDeleteConfirmation(
+                    requireContext(),
+                    "Xóa dịch vụ",
+                    "Bạn có chắc muốn xóa dịch vụ '${dichVu.tenDichVu}' (${CurrencyHelper.format(dichVu.donGia.toLong())})?"
+                ) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        dbManager.dichVuDao.xoa(dichVu.maDichVu)
+                        withContext(Dispatchers.Main) {
+                            UIHelper.showSuccess(requireContext(), "Đã xóa dịch vụ")
+                            taiDuLieu(recyclerView, tvEmpty)
                         }
                     }
-                    .setNegativeButton("Hủy", null).show()
+                }
             }
         )
 

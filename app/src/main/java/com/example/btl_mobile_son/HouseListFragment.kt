@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.btl_mobile_son.adapter.NhaTroAdapter
 import com.example.btl_mobile_son.data.db.DatabaseManager
 import com.example.btl_mobile_son.data.model.NhaTro
+import com.example.btl_mobile_son.utils.UIHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -149,18 +150,10 @@ class HouseListFragment : Fragment() {
                 
                 withContext(Dispatchers.Main) {
                     if (result > 0) {
-                        Toast.makeText(
-                            context,
-                            "✓ Đã xóa \"${nha.tenNha}\"",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        UIHelper.showSuccess(requireContext(), "Đã xóa \"${nha.tenNha}\"")
                         taiDuLieu(view)
                     } else {
-                        Toast.makeText(
-                            context,
-                            "⚠️ Không thể xóa nhà trọ",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        UIHelper.showError(requireContext(), "Không thể xóa nhà trọ")
                     }
                 }
             } catch (e: Exception) {

@@ -22,10 +22,10 @@ class KhachThueDao(private val db: SQLiteDatabase) {
             put("quan_huyen", khachThue.quanHuyen)
             put("xa_phuong", khachThue.xaPhuong)
             put("dia_chi_chi_tiet", khachThue.diaChiChiTiet)
-            // BỎ: put("ma_phong", khachThue.maPhong)
-            // BỎ: put("trang_thai", khachThue.trangThai)
             put("ghi_chu", khachThue.ghiChu)
             put("ngay_tao", khachThue.ngayTao)
+            put("ten_dang_nhap", khachThue.tenDangNhap)
+            put("mat_khau", khachThue.matKhau)
         }
         return db.insert(DatabaseHelper.TABLE_KHACH_THUE, null, values)
     }
@@ -44,9 +44,9 @@ class KhachThueDao(private val db: SQLiteDatabase) {
             put("quan_huyen", khachThue.quanHuyen)
             put("xa_phuong", khachThue.xaPhuong)
             put("dia_chi_chi_tiet", khachThue.diaChiChiTiet)
-            // BỎ: put("ma_phong", khachThue.maPhong)
-            // BỎ: put("trang_thai", khachThue.trangThai)
             put("ghi_chu", khachThue.ghiChu)
+            put("ten_dang_nhap", khachThue.tenDangNhap)
+            put("mat_khau", khachThue.matKhau)
         }
         return db.update(
             DatabaseHelper.TABLE_KHACH_THUE,
@@ -121,6 +121,37 @@ class KhachThueDao(private val db: SQLiteDatabase) {
     // BỎ hàm layTheoPhong vì không còn maPhong trong KhachThue
     // Thay vào đó sẽ dùng HopDongThanhVienDao để lấy danh sách người trong phòng
 
+    fun dangNhap(tenDangNhap: String, matKhau: String): KhachThue? {
+        val cursor = db.query(
+            DatabaseHelper.TABLE_KHACH_THUE,
+            null,
+            "ten_dang_nhap = ? AND mat_khau = ?",
+            arrayOf(tenDangNhap, matKhau),
+            null,
+            null,
+            null
+        )
+        
+        cursor.use {
+            if (it.moveToFirst()) {
+                return cursorToKhachThue(it)
+            }
+        }
+        return null
+    }
+
+    fun capNhatMatKhau(maKhach: Long, matKhauMoi: String): Int {
+        val values = ContentValues().apply {
+            put("mat_khau", matKhauMoi)
+        }
+        return db.update(
+            DatabaseHelper.TABLE_KHACH_THUE,
+            values,
+            "ma_khach = ?",
+            arrayOf(maKhach.toString())
+        )
+    }
+
     private fun cursorToKhachThue(cursor: Cursor): KhachThue {
         return KhachThue(
             maKhach = cursor.getLong(cursor.getColumnIndexOrThrow("ma_khach")),
@@ -138,10 +169,10 @@ class KhachThueDao(private val db: SQLiteDatabase) {
             quanHuyen = cursor.getString(cursor.getColumnIndexOrThrow("quan_huyen")) ?: "",
             xaPhuong = cursor.getString(cursor.getColumnIndexOrThrow("xa_phuong")) ?: "",
             diaChiChiTiet = cursor.getString(cursor.getColumnIndexOrThrow("dia_chi_chi_tiet")) ?: "",
-            // BỎ: maPhong
-            // BỎ: trangThai
             ghiChu = cursor.getString(cursor.getColumnIndexOrThrow("ghi_chu")) ?: "",
-            ngayTao = cursor.getLong(cursor.getColumnIndexOrThrow("ngay_tao"))
+            ngayTao = cursor.getLong(cursor.getColumnIndexOrThrow("ngay_tao")),
+            tenDangNhap = cursor.getString(cursor.getColumnIndexOrThrow("ten_dang_nhap")) ?: "",
+            matKhau = cursor.getString(cursor.getColumnIndexOrThrow("mat_khau")) ?: ""
         )
     }
 }

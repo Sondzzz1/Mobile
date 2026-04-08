@@ -52,15 +52,27 @@ class LoginActivity : AppCompatActivity() {
     private fun login(username: String, password: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                // Try admin/staff login first
                 val nguoiDung = dbManager.nguoiDungDao.dangNhap(username, password)
                 
-                withContext(Dispatchers.Main) {
-                    if (nguoiDung != null) {
+                if (nguoiDung != null) {
+                    withContext(Dispatchers.Main) {
                         sessionManager.createLoginSession(nguoiDung)
                         Toast.makeText(this@LoginActivity, "Đăng nhập thành công", Toast.LENGTH_SHORT).show()
                         startMainActivity()
-                    } else {
-                        Toast.makeText(this@LoginActivity, "Tên đăng nhập hoặc mật khẩu không đúng", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    // Try tenant login
+                    val khachThue = dbManager.khachThueDao.dangNhap(username, password)
+                    
+                    withContext(Dispatchers.Main) {
+                        if (khachThue != null) {
+                            sessionManager.createTenantLoginSession(khachThue.maKhach, khachThue.hoTen, username)
+                            Toast.makeText(this@LoginActivity, "Đăng nhập thành công", Toast.LENGTH_SHORT).show()
+                            startTenantActivity()
+                        } else {
+                            Toast.makeText(this@LoginActivity, "Tên đăng nhập hoặc mật khẩu không đúng", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -73,6 +85,12 @@ class LoginActivity : AppCompatActivity() {
 
     private fun startMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun startTenantActivity() {
+        val intent = Intent(this, TenantMainActivity::class.java)
         startActivity(intent)
         finish()
     }

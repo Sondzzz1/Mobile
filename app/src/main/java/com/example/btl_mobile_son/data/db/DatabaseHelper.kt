@@ -8,7 +8,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "quan_ly_nha_tro.db"
-        private const val DATABASE_VERSION = 9  // Tăng lên 9 để thêm bảng sự cố và người dùng
+        private const val DATABASE_VERSION = 10  // Tăng lên 10 để thêm username/password cho khách thuê
 
         // Tên bảng
         const val TABLE_NHA_TRO = "nha_tro"
@@ -77,7 +77,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 xa_phuong TEXT,
                 dia_chi_chi_tiet TEXT,
                 ghi_chu TEXT,
-                ngay_tao INTEGER DEFAULT 0
+                ngay_tao INTEGER DEFAULT 0,
+                ten_dang_nhap TEXT UNIQUE,
+                mat_khau TEXT
             )
         """)
 

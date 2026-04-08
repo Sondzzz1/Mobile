@@ -107,6 +107,26 @@ class HopDongDao(private val db: SQLiteDatabase) {
         return null
     }
 
+    fun layHopDongHienTaiCuaKhach(maKhach: Long): HopDong? {
+        val cursor = db.query(
+            DatabaseHelper.TABLE_HOP_DONG,
+            null,
+            "ma_khach = ? AND trang_thai = 'dang_thue'",
+            arrayOf(maKhach.toString()),
+            null,
+            null,
+            "ngay_bat_dau DESC",
+            "1"
+        )
+        
+        cursor.use {
+            if (it.moveToFirst()) {
+                return cursorToHopDong(it)
+            }
+        }
+        return null
+    }
+
     fun layTheoMa(maHopDong: Long): HopDong? {
         val cursor = db.query(
             DatabaseHelper.TABLE_HOP_DONG,

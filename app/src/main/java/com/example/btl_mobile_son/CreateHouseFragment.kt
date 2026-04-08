@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import com.example.btl_mobile_son.data.db.DatabaseManager
 import com.example.btl_mobile_son.data.model.NhaTro
 import com.example.btl_mobile_son.utils.ValidationHelper
+import com.example.btl_mobile_son.utils.UIHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -105,13 +106,11 @@ class CreateHouseFragment : Fragment() {
             val ghiChu = etNote.text.toString().trim()
 
             // Validation
-            if (!ValidationHelper.isNotEmpty(tenNha)) {
-                Toast.makeText(context, "Vui lòng nhập tên nhà trọ", Toast.LENGTH_SHORT).show()
+            if (!ValidationHelper.validateRequired(etHouseName, "Tên nhà trọ")) {
                 return@setOnClickListener
             }
 
-            if (sdt.isNotEmpty() && !ValidationHelper.isValidPhoneNumber(sdt)) {
-                Toast.makeText(context, ValidationHelper.getPhoneErrorMessage(), Toast.LENGTH_SHORT).show()
+            if (sdt.isNotEmpty() && !ValidationHelper.validatePhone(etOwnerPhone)) {
                 return@setOnClickListener
             }
 
@@ -136,7 +135,8 @@ class CreateHouseFragment : Fragment() {
                 }
 
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(context, "Đã lưu nhà trọ", Toast.LENGTH_SHORT).show()
+                    val message = if (maNhaEdit > 0) "Đã cập nhật nhà trọ" else "Đã tạo nhà trọ mới"
+                    UIHelper.showSuccess(requireContext(), message)
                     requireActivity().onBackPressed()
                 }
             }

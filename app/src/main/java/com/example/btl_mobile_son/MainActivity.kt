@@ -57,8 +57,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val tvUserName = headerView.findViewById<android.widget.TextView>(R.id.tvUserName)
         val tvUserRole = headerView.findViewById<android.widget.TextView>(R.id.tvUserRole)
         
-        tvUserName.text = sessionManager.getFullName()?.uppercase() ?: "NGƯỜI DÙNG"
-        tvUserRole.text = if (sessionManager.isAdmin()) "QUẢN TRỊ VIÊN" else "NHÂN VIÊN"
+        tvUserName.text = sessionManager.getFullName()?.uppercase() ?: "QUẢN TRỊ VIÊN"
+        tvUserRole.text = "ADMIN"
 
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNav.setOnItemSelectedListener { item ->
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.navigation_invoice -> { loadFragment(InvoiceListFragment()); true }
                 R.id.navigation_tenant -> { loadFragment(TenantListFragment()); true }
                 R.id.navigation_message -> { loadFragment(ContractListFragment()); true }
-                R.id.navigation_issue -> { loadFragment(DepositListFragment()); true }
+                R.id.navigation_issue -> { loadFragment(IssueListFragment()); true }
                 else -> false
             }
         }
@@ -95,8 +95,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_utility -> loadFragment(UtilityListFragment())
             R.id.nav_stats -> loadFragment(StatisticsFragment())
             R.id.nav_report -> loadFragment(ReportFragment())
-            R.id.nav_finance -> loadFragment(IncomeListFragment())
+            R.id.nav_finance -> loadFragment(TransactionListFragment())
             R.id.nav_issue -> loadFragment(IssueListFragment())
+            R.id.nav_message -> {
+                android.widget.Toast.makeText(this, "Tính năng tin nhắn đang phát triển", android.widget.Toast.LENGTH_SHORT).show()
+            }
+            R.id.nav_asset -> {
+                android.widget.Toast.makeText(this, "Tính năng quản lý tài sản đang phát triển", android.widget.Toast.LENGTH_SHORT).show()
+            }
+            R.id.nav_settings -> {
+                android.widget.Toast.makeText(this, "Tính năng cài đặt đang phát triển", android.widget.Toast.LENGTH_SHORT).show()
+            }
             R.id.nav_permission -> {
                 // Logout
                 val sessionManager = SessionManager(this)

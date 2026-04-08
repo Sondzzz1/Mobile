@@ -21,6 +21,16 @@ class SampleDataHelper(private val context: Context) {
         withContext(Dispatchers.IO) {
             val dbManager = DatabaseManager.getInstance(context)
             
+            // 0. Tạo tài khoản admin duy nhất
+            dbManager.nguoiDungDao.them(NguoiDung(
+                tenDangNhap = "admin",
+                matKhau = "admin123",
+                hoTen = "Quản trị viên",
+                vaiTro = "admin",
+                soDienThoai = "0900000000",
+                email = "admin@nhatro.com"
+            ))
+            
             // 1. Tạo nhà trọ mẫu
             val maNha1 = dbManager.nhaTroDao.them(NhaTro(
                 tenNha = "Nhà trọ Việt Tín",
@@ -102,13 +112,15 @@ class SampleDataHelper(private val context: Context) {
                 soNguoiToiDa = 1
             ))
 
-            // 3. Tạo khách thuê mẫu
+            // 3. Tạo khách thuê mẫu (với tài khoản đăng nhập)
             val khach1 = dbManager.khachThueDao.them(KhachThue(
                 hoTen = "Nguyễn Văn Minh",
                 soDienThoai = "0987654321",
                 email = "minh.nv@gmail.com",
                 soCmnd = "079123456789",
-                ghiChu = "Sinh viên năm 3"
+                ghiChu = "Sinh viên năm 3",
+                tenDangNhap = "minh",
+                matKhau = "123456"
             ))
 
             val khach2 = dbManager.khachThueDao.them(KhachThue(
@@ -116,14 +128,18 @@ class SampleDataHelper(private val context: Context) {
                 soDienThoai = "0976543210",
                 email = "hoa.tt@gmail.com",
                 soCmnd = "079987654321",
-                ghiChu = "Nhân viên văn phòng"
+                ghiChu = "Nhân viên văn phòng",
+                tenDangNhap = "hoa",
+                matKhau = "123456"
             ))
 
             val khach3 = dbManager.khachThueDao.them(KhachThue(
                 hoTen = "Lê Hoàng Nam",
                 soDienThoai = "0965432109",
                 email = "nam.lh@gmail.com",
-                soCmnd = "079111222333"
+                soCmnd = "079111222333",
+                tenDangNhap = "nam",
+                matKhau = "123456"
             ))
 
             // 4. Tạo hợp đồng mẫu

@@ -1,89 +1,150 @@
 package com.example.btl_mobile_son.utils
 
-import android.util.Patterns
-import java.util.regex.Pattern
+import android.widget.EditText
 
 object ValidationHelper {
-
-    /**
-     * Kiểm tra số điện thoại Việt Nam (10-11 số)
-     */
-    fun isValidPhoneNumber(phone: String): Boolean {
-        if (phone.isBlank()) return false
-        val phonePattern = Pattern.compile("^(0[3|5|7|8|9])[0-9]{8,9}$")
-        return phonePattern.matcher(phone.trim()).matches()
+    
+    fun validateRequired(editText: EditText, fieldName: String): Boolean {
+        val text = editText.text.toString().trim()
+        if (text.isEmpty()) {
+            editText.error = "$fieldName không được để trống"
+            editText.requestFocus()
+            return false
+        }
+        return true
     }
-
-    /**
-     * Kiểm tra email hợp lệ
-     */
-    fun isValidEmail(email: String): Boolean {
-        if (email.isBlank()) return false
-        return Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()
+    
+    fun validatePhone(editText: EditText): Boolean {
+        val phone = editText.text.toString().trim()
+        if (phone.isEmpty()) {
+            editText.error = "Số điện thoại không được để trống"
+            editText.requestFocus()
+            return false
+        }
+        if (!phone.matches(Regex("^0\\d{9}$"))) {
+            editText.error = "Số điện thoại phải có 10 số và bắt đầu bằng 0"
+            editText.requestFocus()
+            return false
+        }
+        return true
     }
-
-    /**
-     * Kiểm tra CMND/CCCD (9 hoặc 12 số)
-     */
-    fun isValidCMND(cmnd: String): Boolean {
-        if (cmnd.isBlank()) return false
-        val cmndPattern = Pattern.compile("^[0-9]{9}$|^[0-9]{12}$")
-        return cmndPattern.matcher(cmnd.trim()).matches()
+    
+    fun validateEmail(editText: EditText): Boolean {
+        val email = editText.text.toString().trim()
+        if (email.isEmpty()) {
+            return true // Email không bắt buộc
+        }
+        if (!email.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"))) {
+            editText.error = "Email không hợp lệ"
+            editText.requestFocus()
+            return false
+        }
+        return true
     }
-
-    /**
-     * Kiểm tra ngày kết thúc > ngày bắt đầu
-     */
-    fun isValidDateRange(startDate: Long, endDate: Long): Boolean {
-        return endDate > startDate
+    
+    fun validatePositiveNumber(editText: EditText, fieldName: String): Boolean {
+        val text = editText.text.toString().trim()
+        if (text.isEmpty()) {
+            editText.error = "$fieldName không được để trống"
+            editText.requestFocus()
+            return false
+        }
+        try {
+            val number = text.toLong()
+            if (number <= 0) {
+                editText.error = "$fieldName phải lớn hơn 0"
+                editText.requestFocus()
+                return false
+            }
+        } catch (e: NumberFormatException) {
+            editText.error = "$fieldName phải là số"
+            editText.requestFocus()
+            return false
+        }
+        return true
     }
-
-    /**
-     * Kiểm tra số tiền > 0
-     */
-    fun isValidAmount(amount: Double): Boolean {
-        return amount > 0
+    
+    fun validateNonNegativeNumber(editText: EditText, fieldName: String): Boolean {
+        val text = editText.text.toString().trim()
+        if (text.isEmpty()) {
+            editText.error = "$fieldName không được để trống"
+            editText.requestFocus()
+            return false
+        }
+        try {
+            val number = text.toLong()
+            if (number < 0) {
+                editText.error = "$fieldName không được âm"
+                editText.requestFocus()
+                return false
+            }
+        } catch (e: NumberFormatException) {
+            editText.error = "$fieldName phải là số"
+            editText.requestFocus()
+            return false
+        }
+        return true
     }
-
-    /**
-     * Kiểm tra chuỗi không rỗng
-     */
+    
+    fun validateUtilityReading(oldReading: Long, newReading: Long, editText: EditText): Boolean {
+        if (newReading < oldReading) {
+            editText.error = "Chỉ số mới phải lớn hơn hoặc bằng chỉ số cũ ($oldReading)"
+            editText.requestFocus()
+            return false
+        }
+        return true
+    }
+    
+    // Backward compatibility methods
     fun isNotEmpty(text: String): Boolean {
         return text.trim().isNotEmpty()
     }
-
-    /**
-     * Lấy thông báo lỗi cho số điện thoại
-     */
-    fun getPhoneErrorMessage(): String {
-        return "Số điện thoại không hợp lệ (10-11 số, bắt đầu bằng 03, 05, 07, 08, 09)"
+    
+    fun isValidPhoneNumber(phone: String): Boolean {
+        return phone.matches(Regex("^0\\d{9}$"))
     }
-
-    /**
-     * Lấy thông báo lỗi cho email
-     */
+    
+    fun isValidEmail(email: String): Boolean {
+        return email.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"))
+    }
+    
+    fun isValidCMND(cmnd: String): Boolean {
+        return cmnd.matches(Regex("^\\d{9}$|^\\d{12}$"))
+    }
+    
+    fun isValidAmount(amount: String): Boolean {
+        return try {
+            amount.toDouble() > 0
+        } catch (e: NumberFormatException) {
+            false
+        }
+    }
+    
+    fun isValidAmount(amount: Double): Boolean {
+        return amount > 0
+    }
+    
+    fun isValidDateRange(startDate: Long, endDate: Long): Boolean {
+        return endDate > startDate
+    }
+    
+    fun getPhoneErrorMessage(): String {
+        return "Số điện thoại phải có 10 số và bắt đầu bằng 0"
+    }
+    
     fun getEmailErrorMessage(): String {
         return "Email không hợp lệ"
     }
-
-    /**
-     * Lấy thông báo lỗi cho CMND
-     */
+    
     fun getCMNDErrorMessage(): String {
-        return "CMND/CCCD không hợp lệ (9 hoặc 12 số)"
+        return "CMND/CCCD phải có 9 hoặc 12 số"
     }
-
-    /**
-     * Lấy thông báo lỗi cho khoảng ngày
-     */
-    fun getDateRangeErrorMessage(): String {
-        return "Ngày kết thúc phải sau ngày bắt đầu"
-    }
-
-    /**
-     * Lấy thông báo lỗi cho số tiền
-     */
+    
     fun getAmountErrorMessage(): String {
         return "Số tiền phải lớn hơn 0"
+    }
+    
+    fun getDateRangeErrorMessage(): String {
+        return "Ngày kết thúc phải sau ngày bắt đầu"
     }
 }

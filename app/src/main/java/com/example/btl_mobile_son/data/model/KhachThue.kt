@@ -14,8 +14,8 @@ data class KhachThue(
     val quanHuyen: String = "",
     val xaPhuong: String = "",
     val diaChiChiTiet: String = "",
-    // BỎ: val maPhong: Long? = null,
-    // BỎ: val trangThai: String = "dang_o",
     val ghiChu: String = "",
-    val ngayTao: Long = System.currentTimeMillis()
+    val ngayTao: Long = System.currentTimeMillis(),
+    val tenDangNhap: String? = null,
+    val matKhau: String? = null
 )

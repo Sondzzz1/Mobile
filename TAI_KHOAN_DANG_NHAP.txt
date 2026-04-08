@@ -1,0 +1,67 @@
+═══════════════════════════════════════════════════════════
+    🔐 TÀI KHOẢN ĐĂNG NHẬP - ỨNG DỤNG QUẢN LÝ NHÀ TRỌ
+═══════════════════════════════════════════════════════════
+
+📌 HỆ THỐNG CHỈ CÓ 2 LOẠI TÀI KHOẢN:
+   1. ADMIN (Quản trị viên)
+   2. NGƯỜI DÙNG (Khách thuê)
+
+───────────────────────────────────────────────────────────
+
+👨‍💼 TÀI KHOẢN ADMIN
+───────────────────────────────────────────────────────────
+Username: admin
+Password: admin123
+
+Quyền hạn: Toàn quyền quản lý hệ thống
+- Quản lý nhà trọ, phòng, khách thuê
+- Tạo và quản lý hợp đồng
+- Tạo hóa đơn và theo dõi thanh toán
+- Quản lý dịch vụ và chỉ số điện nước
+- Quản lý thu chi
+- Xem báo cáo và thống kê
+- Xử lý sự cố
+
+───────────────────────────────────────────────────────────
+
+👤 TÀI KHOẢN NGƯỜI DÙNG (Khách thuê)
+───────────────────────────────────────────────────────────
+
+1. Nguyễn Văn Minh
+   Username: minh
+   Password: 123456
+   Phòng: 101 - Nhà trọ Việt Tín
+   Tiền thuê: 2,500,000đ/tháng
+
+2. Trần Thị Hoa
+   Username: hoa
+   Password: 123456
+   Phòng: 103 - Nhà trọ Việt Tín
+   Tiền thuê: 3,000,000đ/tháng
+
+3. Lê Hoàng Nam
+   Username: nam
+   Password: 123456
+   Phòng: 201 - Nhà trọ Hòa Bình
+   Tiền thuê: 2,800,000đ/tháng
+
+───────────────────────────────────────────────────────────
+
+🚀 CÁCH SỬ DỤNG
+───────────────────────────────────────────────────────────
+1. Mở app lần đầu → Dữ liệu mẫu tự động được tạo
+2. Đăng nhập với tài khoản trên
+3. Hệ thống tự động chuyển hướng:
+   - Admin → Giao diện quản lý
+   - Người dùng → Giao diện khách thuê
+
+───────────────────────────────────────────────────────────
+
+📝 LƯU Ý
+───────────────────────────────────────────────────────────
+- Mật khẩu là text thuần (không mã hóa) để dễ test
+- Có thể reset dữ liệu bằng cách xóa data app
+- Admin có thể tạo thêm tài khoản khách thuê mới
+- Khách thuê có thể đổi mật khẩu trong phần "Cá nhân"
+
+═══════════════════════════════════════════════════════════

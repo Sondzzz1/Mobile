@@ -63,7 +63,7 @@ class DashboardFragment : Fragment() {
         }
 
         view.findViewById<View>(R.id.btnDeposit)?.setOnClickListener {
-            navigate(DepositListFragment())
+            navigate(TransactionListFragment())
         }
 
         view.findViewById<View>(R.id.btnTenant)?.setOnClickListener {
@@ -76,19 +76,19 @@ class DashboardFragment : Fragment() {
 
         // Grid quản lý - Hàng 3
         view.findViewById<View>(R.id.btnIncome)?.setOnClickListener {
-            navigate(IncomeListFragment())
+            navigate(TransactionListFragment())
         }
 
         view.findViewById<View>(R.id.btnExpense)?.setOnClickListener {
-            navigate(ExpenseListFragment())
+            navigate(TransactionListFragment())
         }
 
         view.findViewById<View>(R.id.btnReservation)?.setOnClickListener {
-            navigate(DepositListFragment())
+            navigate(TransactionListFragment())
         }
 
         view.findViewById<View>(R.id.btnReport)?.setOnClickListener {
-            Toast.makeText(context, "Chức năng thống kê đang phát triển", Toast.LENGTH_SHORT).show()
+            navigate(ReportFragment())
         }
 
         // Header buttons
@@ -142,6 +142,9 @@ class DashboardFragment : Fragment() {
                     }
                     .sumOf { it.soTien }
 
+                // Kiểm tra cảnh báo
+                checkWarnings()
+
                 withContext(Dispatchers.Main) {
                     tvRoomStats?.text = "$phongDaThue/$tongPhong"
                     tvTenantCount?.text = "$soKhach"
@@ -158,6 +161,53 @@ class DashboardFragment : Fragment() {
                     tvMonthRevenue?.text = "0đ"
                 }
             }
+        }
+    }
+
+    private suspend fun checkWarnings() {
+        try {
+            val warnings = mutableListOf<String>()
+            
+            // Kiểm tra hợp đồng sắp hết hạn (30 ngày)
+            val hopDongSapHetHan = dbManager.hopDongDao.layTatCa().filter { hopDong ->
+                if (hopDong.trangThai != "dang_thue") return@filter false
+                val ngayHetHan = hopDong.ngayKetThuc
+                val ngayHienTai = System.currentTimeMillis()
+                val soNgayConLai = (ngayHetHan - ngayHienTai) / (1000 * 60 * 60 * 24)
+                soNgayConLai in 1..30
+            }
+            if (hopDongSapHetHan.isNotEmpty()) {
+                warnings.add("⚠ ${hopDongSapHetHan.size} hợp đồng sắp hết hạn")
+            }
+
+            // Kiểm tra hóa đơn quá hạn
+            val hoaDonQuaHan = dbManager.hoaDonDao.layTatCa().count { 
+                it.trangThai == "qua_han" 
+            }
+            if (hoaDonQuaHan > 0) {
+                warnings.add("⚠ $hoaDonQuaHan hóa đơn quá hạn chưa thanh toán")
+            }
+
+            // Kiểm tra sự cố chưa xử lý
+            val suCoChuaXuLy = dbManager.suCoDao.layTatCa().count { 
+                it.trangThai == "chua_xu_ly" 
+            }
+            if (suCoChuaXuLy > 0) {
+                warnings.add("⚠ $suCoChuaXuLy sự cố chưa xử lý")
+            }
+
+            // Hiển thị cảnh báo
+            if (warnings.isNotEmpty()) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        context, 
+                        warnings.joinToString("\n"), 
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("DashboardFragment", "Error checking warnings", e)
         }
     }
 
