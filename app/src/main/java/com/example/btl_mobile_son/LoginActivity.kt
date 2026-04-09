@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.btl_mobile_son.data.db.DatabaseManager
@@ -42,6 +43,7 @@ class LoginActivity : AppCompatActivity() {
         val etUsername = findViewById<EditText>(R.id.etUsername)
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
+        val tvRegister = findViewById<TextView>(R.id.tvRegister)
         
         btnLogin.setOnClickListener {
             val username = etUsername.text.toString().trim()
@@ -56,14 +58,14 @@ class LoginActivity : AppCompatActivity() {
         }
 
         // Register button
-        findViewById<android.widget.TextView>(R.id.tvRegister).setOnClickListener {
+        tvRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
     }
 
     private fun createDefaultAdminIfNeeded() {
-        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 // Kiểm tra xem đã có admin chưa
                 val adminExists = try {
