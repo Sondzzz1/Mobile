@@ -3,33 +3,80 @@ package com.example.btl_mobile_son.data.db
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import com.example.btl_mobile_son.data.dao.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 class DatabaseManager private constructor(context: Context) {
     
-    init {
-        android.util.Log.d("DatabaseManager", "Initializing DatabaseManager...")
-    }
-    
     private val dbHelper: DatabaseHelper = DatabaseHelper(context)
-    private val database: SQLiteDatabase = dbHelper.writableDatabase.also {
-        android.util.Log.d("DatabaseManager", "Database opened successfully")
+    private var _database: SQLiteDatabase? = null
+    private val mutex = Mutex()
+
+    /**
+     * Hàm lấy database an toàn. Luôn gọi hàm này trước khi sử dụng các DAO
+     * để đảm bảo database đã được mở ở background thread.
+     */
+    suspend fun getDatabase(): SQLiteDatabase = withContext(Dispatchers.IO) {
+        _database?.let { if (it.isOpen) return@withContext it }
+        
+        mutex.withLock {
+            _database?.let { if (it.isOpen) return@withContext it }
+            android.util.Log.d("DatabaseManager", "Opening database safely on IO thread...")
+            val db = dbHelper.writableDatabase
+            _database = db
+            db
+        }
     }
 
-    // Các DAO
-    val nhaTroDao: NhaTroDao by lazy { NhaTroDao(database) }
-    val phongDao: PhongDao by lazy { PhongDao(database) }
-    val khachThueDao: KhachThueDao by lazy { KhachThueDao(database) }
-    val hopDongDao: HopDongDao by lazy { HopDongDao(database) }
-    val hopDongThanhVienDao: HopDongThanhVienDao by lazy { HopDongThanhVienDao(database) }
-    val dichVuDao: DichVuDao by lazy { DichVuDao(database) }
-    val phongDichVuDao: PhongDichVuDao by lazy { PhongDichVuDao(database) } // VĐ1: DAO mới
-    val datCocDao: DatCocDao by lazy { DatCocDao(database) }
-    val chiSoDienNuocDao: ChiSoDienNuocDao by lazy { ChiSoDienNuocDao(database) }
-    val hoaDonDao: HoaDonDao by lazy { HoaDonDao(database) }
-    val chiTietHoaDonDao: ChiTietHoaDonDao by lazy { ChiTietHoaDonDao(database) }
-    val giaoDichDao: GiaoDichDao by lazy { GiaoDichDao(database) }
-    val suCoDao: SuCoDao by lazy { SuCoDao(database) }
-    val nguoiDungDao: NguoiDungDao by lazy { NguoiDungDao(database) }
+    /**
+     * Lấy instance database hiện tại. 
+     * CẢNH BÁO: Phải đảm bảo getDatabase() đã được gọi thành công trước đó.
+     */
+    private fun getDb(): SQLiteDatabase {
+        val db = _database
+        if (db == null || !db.isOpen) {
+            // Nếu chưa có, vẫn phải mở nhưng log cảnh báo vì đây là nguy cơ gây treo máy
+            android.util.Log.w("DatabaseManager", "DATABASE ACCESS BEFORE INITIALIZATION! This may cause ANR.")
+            return dbHelper.writableDatabase.also { _database = it }
+        }
+        return db
+    }
+
+    // Các DAO sử dụng instance database đã mở
+    val nhaTroDao by lazy { NhaTroDao(getDb()) }
+    val phongDao by lazy { PhongDao(getDb()) }
+    val khachThueDao by lazy { KhachThueDao(getDb()) }
+    val hopDongDao by lazy { HopDongDao(getDb()) }
+    val hopDongThanhVienDao by lazy { HopDongThanhVienDao(getDb()) }
+    val dichVuDao by lazy { DichVuDao(getDb()) }
+    val phongDichVuDao by lazy { PhongDichVuDao(getDb()) }
+    val datCocDao by lazy { DatCocDao(getDb()) }
+    val chiSoDienNuocDao by lazy { ChiSoDienNuocDao(getDb()) }
+    val hoaDonDao by lazy { HoaDonDao(getDb()) }
+    val chiTietHoaDonDao by lazy { ChiTietHoaDonDao(getDb()) }
+    val giaoDichDao by lazy { GiaoDichDao(getDb()) }
+    val suCoDao by lazy { SuCoDao(getDbInternal()) } // Giữ lại tên cũ nếu cần hoặc đổi thành getDb()
+    val nguoiDungDao by lazy { NguoiDungDao(getDb()) }
+    
+    // Alias để tránh lỗi compile nếu code cũ dùng getDbInternal
+    private fun getDbInternal() = getDb()
+
+    /**
+     * Kích hoạt việc mở database ở background thread để tránh delay khi sử dụng lần đầu.
+     */
+    fun triggerInitialization() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                getDatabase()
+            } catch (e: Exception) {
+                android.util.Log.e("DatabaseManager", "Error triggering initialization", e)
+            }
+        }
+    }
 
     companion object {
         @Volatile
@@ -45,7 +92,7 @@ class DatabaseManager private constructor(context: Context) {
     }
 
     fun close() {
-        database.close()
+        _database?.close()
         dbHelper.close()
     }
 }

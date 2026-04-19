@@ -7,8 +7,8 @@ import android.database.sqlite.SQLiteOpenHelper
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
-        private const val DATABASE_NAME = "quan_ly_nha_tro.db"
-        private const val DATABASE_VERSION = 10  // Tăng lên 10 để thêm username/password cho khách thuê
+        private const val DATABASE_NAME = "quan_ly_nha_tro_final.db"
+        private const val DATABASE_VERSION = 11  // Tăng lên 11 để xoá trắng CSDL cũ và tạo lại bảng mới không chứa dữ liệu mẫu
 
         // Tên bảng
         const val TABLE_NHA_TRO = "nha_tro"
@@ -28,12 +28,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
 
     override fun onCreate(db: SQLiteDatabase) {
-        // Thiết lập encoding UTF-8 để hỗ trợ tiếng Việt
-        db.execSQL("PRAGMA encoding = 'UTF-8'")
+        android.util.Log.d("DatabaseHelper", "onCreate started")
         
         android.util.Log.d("DatabaseHelper", "Creating database tables...")
         
-        // Bảng Nhà trọ
+        android.util.Log.d("DatabaseHelper", "Creating TABLE_NHA_TRO...")
         db.execSQL("""
             CREATE TABLE $TABLE_NHA_TRO (
                 ma_nha INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,8 +43,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 ghi_chu TEXT
             )
         """)
+        android.util.Log.d("DatabaseHelper", "TABLE_NHA_TRO created")
 
-        // Bảng Phòng
+        android.util.Log.d("DatabaseHelper", "Creating TABLE_PHONG...")
         db.execSQL("""
             CREATE TABLE $TABLE_PHONG (
                 ma_phong INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -59,6 +59,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 FOREIGN KEY (ma_nha) REFERENCES $TABLE_NHA_TRO(ma_nha) ON DELETE CASCADE
             )
         """)
+        android.util.Log.d("DatabaseHelper", "TABLE_PHONG created")
 
         // Bảng Khách thuê (đã bỏ ma_phong và trang_thai - dùng HopDongThanhVien thay thế)
         db.execSQL("""
@@ -253,7 +254,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             )
         """)
 
-        // Bảng Người dùng
+        android.util.Log.d("DatabaseHelper", "Creating TABLE_NGUOI_DUNG...")
         db.execSQL("""
             CREATE TABLE $TABLE_NGUOI_DUNG (
                 ma_nguoi_dung INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -267,12 +268,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 ngay_tao INTEGER DEFAULT 0
             )
         """)
+        android.util.Log.d("DatabaseHelper", "TABLE_NGUOI_DUNG created")
 
         // Tạo tài khoản admin mặc định (mật khẩu: admin123)
         db.execSQL("""
             INSERT INTO $TABLE_NGUOI_DUNG (ten_dang_nhap, mat_khau, ho_ten, vai_tro, ngay_tao)
             VALUES ('admin', 'admin123', 'Quản trị viên', 'admin', ${System.currentTimeMillis()})
         """)
+        android.util.Log.d("DatabaseHelper", "onCreate completed")
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -298,7 +301,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         
         // Tạo lại tất cả
         onCreate(db)
-        android.util.Log.d("DatabaseHelper", "Database upgrade completed")
+        android.util.Log.d("DatabaseHelper", "onUpgrade completed")
     }
     
     override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -322,7 +325,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         
         // Tạo lại tất cả
         onCreate(db)
-        android.util.Log.d("DatabaseHelper", "Database downgrade completed")
+        android.util.Log.d("DatabaseHelper", "onDowngrade completed")
     }
     
     
@@ -330,13 +333,10 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         super.onConfigure(db)
         // Bật foreign key constraints
         db.setForeignKeyConstraintsEnabled(true)
-        // Thiết lập encoding UTF-8 cho tiếng Việt
-        db.execSQL("PRAGMA encoding = 'UTF-8'")
     }
     
     override fun onOpen(db: SQLiteDatabase) {
         super.onOpen(db)
-        // Đảm bảo encoding UTF-8 mỗi khi mở database
-        db.execSQL("PRAGMA encoding = 'UTF-8'")
+        android.util.Log.d("DatabaseHelper", "Database onOpen called")
     }
 }

@@ -25,17 +25,30 @@ class LoginActivity : AppCompatActivity() {
         
         // Nếu đã đăng nhập, chuyển thẳng vào MainActivity hoặc TenantMainActivity
         if (sessionManager.isLoggedIn()) {
-            if (sessionManager.isAdmin()) {
-                startMainActivity()
-            } else if (sessionManager.isTenant()) {
-                startTenantActivity()
+            when {
+                sessionManager.isAdmin() -> {
+                    startMainActivity()
+                    return
+                }
+                sessionManager.isTenant() -> {
+                    startTenantActivity()
+                    return
+                }
+                else -> {
+                    // Trạng thái không hợp lệ, đăng xuất và tiếp tục hiện màn hình login
+                    sessionManager.logout()
+                }
             }
-            return
         }
         
         setContentView(R.layout.activity_login)
         
+        // Khởi tạo DatabaseManager ở background nếu cần thiết, 
+        // nhưng ở đây getInstance chỉ lấy instance, việc mở DB đã được làm lazy.
         dbManager = DatabaseManager.getInstance(this)
+        
+        // Kích hoạt khởi tạo DB ở background ngay từ bây giờ để sẵn sàng khi vào Dashboard
+        dbManager.triggerInitialization()
         
         // Tạo tài khoản admin mặc định nếu chưa có
         createDefaultAdminIfNeeded()

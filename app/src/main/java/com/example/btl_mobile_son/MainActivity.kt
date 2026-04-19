@@ -2,18 +2,18 @@ package com.example.btl_mobile_son
 
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.example.btl_mobile_son.data.SampleDataHelper
+import com.example.btl_mobile_son.data.db.DatabaseManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -23,44 +23,44 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Kiểm tra session - nếu chưa đăng nhập hoặc không phải admin, chuyển về LoginActivity
         sessionManager = SessionManager(this)
         if (!sessionManager.isLoggedIn()) {
-            val intent = android.content.Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            startActivity(android.content.Intent(this, LoginActivity::class.java))
             finish()
             return
         }
         
-        // Nếu là tenant, chuyển sang TenantMainActivity
         if (sessionManager.isTenant()) {
-            val intent = android.content.Intent(this, TenantMainActivity::class.java)
-            startActivity(intent)
-            finish()
-            return
-        }
-        
-        // Chỉ admin mới vào MainActivity
-        if (!sessionManager.isAdmin()) {
-            sessionManager.logout()
-            val intent = android.content.Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            startActivity(android.content.Intent(this, TenantMainActivity::class.java))
             finish()
             return
         }
         
         setContentView(R.layout.activity_main)
 
-        // Cập nhật trạng thái hợp đồng hết hạn
-        lifecycleScope.launch {
-            try {
-                withContext(Dispatchers.IO) {
-                    val dbManager = com.example.btl_mobile_son.data.db.DatabaseManager.getInstance(this@MainActivity)
-                    dbManager.hopDongDao.capNhatHopDongHetHan()
+        // Xử lý nút Back bằng OnBackPressedDispatcher
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                } else {
+                    // Nếu Drawer không mở, thực hiện hành động back mặc định
+                    isEnabled = false // Tạm tắt callback để tránh lặp vô hạn
+                    onBackPressedDispatcher.onBackPressed()
+                    isEnabled = true // Bật lại sau đó
                 }
+            }
+        })
+
+        // Khởi tạo Database ở background ngay lập tức
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val dbManager = DatabaseManager.getInstance(this@MainActivity)
+                dbManager.getDatabase() // Mồi database mở sẵn ở background
+                dbManager.hopDongDao.capNhatHopDongHetHan()
+                android.util.Log.d("MainActivity", "Database initialized in background")
             } catch (e: Exception) {
-                e.printStackTrace()
-                android.util.Log.e("MainActivity", "Error updating contracts", e)
+                android.util.Log.e("MainActivity", "Background DB Init Error", e)
             }
         }
 
@@ -70,19 +70,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         drawerLayout = findViewById(R.id.drawer_layout)
         val navView = findViewById<NavigationView>(R.id.nav_view)
-
         val toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
+        
+        // Đảm bảo click vào icon Menu sẽ mở ngăn kéo Drawer
+        toolbar.setNavigationOnClickListener {
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START)
+            } else {
+                drawerLayout.openDrawer(GravityCompat.START)
+            }
+        }
+
         navView.setNavigationItemSelectedListener(this)
 
-        // Display user info in nav header
         val headerView = navView.getHeaderView(0)
-        val tvUserName = headerView.findViewById<android.widget.TextView>(R.id.tvUserName)
-        val tvUserRole = headerView.findViewById<android.widget.TextView>(R.id.tvUserRole)
-        
-        tvUserName.text = sessionManager.getFullName()?.uppercase() ?: "QUẢN TRỊ VIÊN"
-        tvUserRole.text = "ADMIN"
+        headerView.findViewById<android.widget.TextView>(R.id.tvUserName).text = 
+            sessionManager.getFullName()?.uppercase() ?: "QUẢN TRỊ VIÊN"
+        headerView.findViewById<android.widget.TextView>(R.id.tvUserRole).text = "ADMIN"
 
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNav.setOnItemSelectedListener { item ->
@@ -121,32 +127,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_report -> loadFragment(ReportFragment())
             R.id.nav_finance -> loadFragment(TransactionListFragment())
             R.id.nav_issue -> loadFragment(IssueListFragment())
-            R.id.nav_message -> {
-                android.widget.Toast.makeText(this, "Tính năng tin nhắn đang phát triển", android.widget.Toast.LENGTH_SHORT).show()
-            }
-            R.id.nav_asset -> {
-                android.widget.Toast.makeText(this, "Tính năng quản lý tài sản đang phát triển", android.widget.Toast.LENGTH_SHORT).show()
-            }
-            R.id.nav_settings -> {
-                android.widget.Toast.makeText(this, "Tính năng cài đặt đang phát triển", android.widget.Toast.LENGTH_SHORT).show()
-            }
             R.id.nav_permission -> {
-                // Logout
                 sessionManager.logout()
-                val intent = android.content.Intent(this, LoginActivity::class.java)
-                startActivity(intent)
+                startActivity(android.content.Intent(this, LoginActivity::class.java))
                 finish()
             }
         }
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
-    }
-
-    override fun onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
     }
 }
