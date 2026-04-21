@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BTL_Mobile_Son">
         <activity
-            android:name=".LoginActivity"
+            android:name=".DangNhapActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,13 +20,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".ManHinhChinhAdminActivity"
             android:exported="false" />
         <activity
-            android:name=".TenantMainActivity"
+            android:name=".ManHinhChinhKhachThueActivity"
             android:exported="false" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".DangKyActivity"
             android:exported="false" />
     </application>
 
